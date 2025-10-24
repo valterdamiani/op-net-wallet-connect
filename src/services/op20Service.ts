@@ -1,209 +1,57 @@
-const OPNET_CONFIG = {
-  RPC_URL: import.meta.env.VITE_OPNET_RPC_URL,
-  CHAIN_ID: import.meta.env.VITE_OPNET_CHAIN_ID,
-  CHAIN_NAME: import.meta.env.VITE_OPNET_CHAIN_NAME,
-  NATIVE_CURRENCY: {
-    name: import.meta.env.VITE_OPNET_CURRENCY_NAME,
-    symbol: import.meta.env.VITE_OPNET_CURRENCY_SYMBOL,
-    decimals: parseInt(import.meta.env.VITE_OPNET_CURRENCY_DECIMALS),
-  },
-};
+import { getContract, IOP20Contract, OP_20_ABI, JSONRpcProvider } from "opnet";
+import { networks } from "@btc-vision/bitcoin";
 
-const OP20_CONFIG = {
-  TOKEN_ADDRESS: import.meta.env.VITE_OP20_TOKEN_ADDRESS,
-  SPENDER_ADDRESS: import.meta.env.VITE_OP20_SPENDER_ADDRESS,
-};
+const url = "https://regtest.opnet.org";
+const network = networks.regtest;
+const timeout = 10000; // 10 seconds
+
+const provider = new JSONRpcProvider(url, network, timeout);
 
 export interface TokenMetadata {
-  name: string;
-  symbol: string;
-  decimals: number;
-  maxSupply: string;
-  totalSupply: string;
-}
-
-export interface TokenBalance {
-  balance: string;
-  allowance: string;
+    name: string;
+    symbol: string;
+    decimals: number;
+    maxSupply: string;
+    totalSupply: string;
 }
 
 export class OP20Service {
-  private rpcUrl: string;
-  private tokenAddress: string;
-  private spenderAddress: string;
+    private provider: JSONRpcProvider;
 
-  constructor() {
-    this.rpcUrl = OPNET_CONFIG.RPC_URL;
-    this.tokenAddress = OP20_CONFIG.TOKEN_ADDRESS;
-    this.spenderAddress = OP20_CONFIG.SPENDER_ADDRESS;
-  }
-
-  public getTokenAddress(): string {
-    return this.tokenAddress;
-  }
-
-  public getSpenderAddress(): string {
-    return this.spenderAddress;
-  }
-
-  async getTokenMetadata(): Promise<TokenMetadata> {
-    try {
-      const [name, symbol, decimals, maxSupply, totalSupply] = await Promise.all([
-        this.callContract('name()', 'string'),
-        this.callContract('symbol()', 'string'),
-        this.callContract('decimals()', 'uint8'),
-        this.callContract('maxSupply()', 'uint256'),
-        this.callContract('totalSupply()', 'uint256'),
-      ]);
-
-      return {
-        name: name as string,
-        symbol: symbol as string,
-        decimals: Number(decimals),
-        maxSupply: (maxSupply as string),
-        totalSupply: (totalSupply as string),
-      };
-    } catch (error) {
-      console.error('Error fetching token metadata:', error);
-      throw new Error('Failed to fetch token metadata');
-    }
-  }
-
-  async getTokenBalance(userAddress: string): Promise<TokenBalance> {
-    try {
-      const [balance, allowance] = await Promise.all([
-        this.callContract(`balanceOf(address)`, 'uint256', [userAddress]),
-        this.callContract(`allowance(address,address)`, 'uint256', [userAddress, this.spenderAddress]),
-      ]);
-
-      return {
-        balance: (balance as string),
-        allowance: (allowance as string),
-      };
-    } catch (error) {
-      console.error('Error fetching token balance:', error);
-      throw new Error('Failed to fetch token balance');
-    }
-  }
-
-  async approveTokens(userAddress: string, amount: string): Promise<string> {
-    try {
-      const txHash = await this.sendTransaction(userAddress, 'approve(address,uint256)', [
-        this.spenderAddress,
-        amount,
-      ]);
-      return txHash;
-    } catch (error) {
-      console.error('Error approving tokens:', error);
-      throw new Error('Failed to approve tokens');
-    }
-  }
-
-  async transferTokens(userAddress: string, toAddress: string, amount: string): Promise<string> {
-    try {
-      const txHash = await this.sendTransaction(userAddress, 'transfer(address,uint256)', [
-        toAddress,
-        amount,
-      ]);
-      return txHash;
-    } catch (error) {
-      console.error('Error transferring tokens:', error);
-      throw new Error('Failed to transfer tokens');
-    }
-  }
-
-  private async callContract(method: string, returnType: string, params: any[] = []): Promise<any> {
-    const data = this.encodeFunctionCall(method, params);
-    
-    const response = await fetch(this.rpcUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'eth_call',
-        params: [
-          {
-            to: this.tokenAddress,
-            data: data,
-          },
-          'latest',
-        ],
-        id: 1,
-      }),
-    });
-
-    const result = await response.json();
-    
-    if (result.error) {
-      throw new Error(result.error.message);
+    constructor() {
+        this.provider = provider;
     }
 
-    return this.decodeReturnValue(result.result, returnType);
-  }
+    async getOp20Contract(): Promise<IOP20Contract> {
+        return await getContract<IOP20Contract>(
+        import.meta.env.VITE_OP20_TOKEN_ADDRESS,
+        OP_20_ABI,
+            this.provider,
+            networks.regtest
+        );
+    }   
 
-  private async sendTransaction(_userAddress: string, method: string, params: any[]): Promise<string> {
-    this.encodeFunctionCall(method, params);
-    
-    const txHash = `0x${Math.random().toString(16).substr(2, 64)}`;
-    
-    return txHash;
-  }
+    async getTokenMetadata(): Promise<TokenMetadata> {
+        const op20Contract = await this.getOp20Contract();
 
-  private encodeFunctionCall(method: string, params: any[]): string {
-    const methodHash = this.getMethodHash(method);
-    let data = methodHash;
-    
-    for (const param of params) {
-      if (typeof param === 'string' && param.startsWith('0x')) {
-        data += param.slice(2).padStart(64, '0');
-      } else if (typeof param === 'string') {
-        data += param.slice(2).padStart(64, '0');
-      } else {
-        data += param.toString(16).padStart(64, '0');
-      }
+        const name = await op20Contract.name();
+        const symbol = await op20Contract.symbol();
+        const decimals = await op20Contract.decimals();
+        const maxSupply = await op20Contract.maximumSupply();
+        const totalSupply = await op20Contract.totalSupply();
+
+        try {
+            return {
+                name: name.properties.name,
+                symbol: symbol.properties.symbol,
+                decimals: decimals.properties.decimals,
+                maxSupply: maxSupply.properties.maximumSupply.toString(),
+                totalSupply: totalSupply.properties.totalSupply.toString(),
+            };
+        } catch (error) {
+            throw new Error(`Failed to fetch token metadata: ${error}`);
+        }
     }
-    
-    return data;
-  }
-
-  private getMethodHash(method: string): string {
-    const methodHashes: { [key: string]: string } = {
-      'name()': import.meta.env.VITE_METHOD_HASH_NAME,
-      'symbol()': import.meta.env.VITE_METHOD_HASH_SYMBOL,
-      'decimals()': import.meta.env.VITE_METHOD_HASH_DECIMALS,
-      'maxSupply()': import.meta.env.VITE_METHOD_HASH_MAX_SUPPLY,
-      'totalSupply()': import.meta.env.VITE_METHOD_HASH_TOTAL_SUPPLY,
-      'balanceOf(address)': import.meta.env.VITE_METHOD_HASH_BALANCE_OF,
-      'allowance(address,address)': import.meta.env.VITE_METHOD_HASH_ALLOWANCE,
-      'approve(address,uint256)': import.meta.env.VITE_METHOD_HASH_APPROVE,
-      'transfer(address,uint256)': import.meta.env.VITE_METHOD_HASH_TRANSFER,
-    };
-    
-    const hash = methodHashes[method] || import.meta.env.VITE_METHOD_HASH_DEFAULT;
-    
-    if (!hash) {
-      throw new Error(`Method hash not configured for ${method}. Please set the appropriate VITE_METHOD_HASH_* environment variable.`);
-    }
-    
-    return hash;
-  }
-
-  private decodeReturnValue(hexValue: string, returnType: string): any {
-    if (!hexValue || hexValue === '0x') return '0';
-    
-    const value = hexValue.slice(2);
-    
-    switch (returnType) {
-      case 'string':
-        return 'OP_20_Token';
-      case 'uint8':
-        return parseInt(value, 16);
-      case 'uint256':
-        return BigInt('0x' + value).toString();
-      default:
-        return value;
-    }
-  }
 }
+
+export default provider;
