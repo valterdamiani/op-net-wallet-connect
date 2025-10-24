@@ -28,7 +28,15 @@
       "network": "Réseau :",
       "yourTokenData": "Vos Données de Token",
       "balance": "Solde :",
-      "allowance": "Autorisation (Spender) :"
+      "allowance": "Autorisation (Spender) :",
+      "connectingTitle": "Connexion...",
+      "connectingMessage": "Veuillez compléter la connexion dans votre portefeuille",
+      "connectTitle": "Connecter Votre Portefeuille",
+      "connectMessage": "Connectez-vous à la blockchain OpNet et interagissez avec les tokens OP_20",
+      "networkValue": "OpNet Regtest (ID de Chaîne : 12345)",
+      "notConnected": "Non connecté",
+      "copyToClipboard": "Copier dans le presse-papiers",
+      "copied": "Copié !"
     },
     "transactions": {
       "approve": "Approuver les Tokens",
@@ -50,7 +58,8 @@
       "failedToLoadMetadata": "Échec du chargement des métadonnées du token",
       "failedToLoadBalance": "Échec du chargement du solde du token",
       "failedToApprove": "Échec de l'approbation des tokens",
-      "failedToTransfer": "Échec du transfert des tokens"
+      "failedToTransfer": "Échec du transfert des tokens",
+      "failedToOpenModal": "Échec de l'ouverture de la fenêtre de connexion du portefeuille"
     }
   },
   "features": {

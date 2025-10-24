@@ -1,5 +1,6 @@
 import { getContract, IOP20Contract, OP_20_ABI, JSONRpcProvider } from "opnet";
 import { networks } from "@btc-vision/bitcoin";
+import { Address } from "@btc-vision/transaction";
 
 const url = "https://regtest.opnet.org";
 const network = networks.regtest;
@@ -15,8 +16,14 @@ export interface TokenMetadata {
     totalSupply: string;
 }
 
+export interface ConnectedData {
+    userBalance: string;
+    allowance: string;
+    networkName: string;
+}
+
 export class OP20Service {
-    private provider: JSONRpcProvider;
+  private provider: JSONRpcProvider;
 
     constructor() {
         this.provider = provider;
@@ -24,29 +31,44 @@ export class OP20Service {
 
     async getOp20Contract(): Promise<IOP20Contract> {
         return await getContract<IOP20Contract>(
-        import.meta.env.VITE_OP20_TOKEN_ADDRESS,
-        OP_20_ABI,
+            import.meta.env.VITE_OP20_TOKEN_ADDRESS,
+            OP_20_ABI,
             this.provider,
             networks.regtest
         );
-    }   
+    }
+
+    async getConectedData(): Promise<ConnectedData> {
+        const op20Contract = await this.getOp20Contract();
+        const address = Address.fromString(import.meta.env.VITE_OP20_TOKEN_ADDRESS);
+
+        const userBalance = await op20Contract.balanceOf(address);
+        const allowance = await op20Contract.allowance(address, address);
+        const chainId = await this.provider.getChainId();
+        const network = await this.provider.getNetwork();
+
+        const networkName = network.messagePrefix + ' ( Chain ID: ' + chainId.toString() + ')';
+
+        return {
+            userBalance: userBalance.properties.balance.toString(),
+            allowance: allowance.properties.remaining.toString(),
+            networkName: networkName,
+        };
+    }
 
     async getTokenMetadata(): Promise<TokenMetadata> {
         const op20Contract = await this.getOp20Contract();
 
-        const name = await op20Contract.name();
-        const symbol = await op20Contract.symbol();
-        const decimals = await op20Contract.decimals();
+        const metadata = await op20Contract.metadata();
         const maxSupply = await op20Contract.maximumSupply();
-        const totalSupply = await op20Contract.totalSupply();
-
+        
         try {
             return {
-                name: name.properties.name,
-                symbol: symbol.properties.symbol,
-                decimals: decimals.properties.decimals,
+                name: metadata.properties.name,
+                symbol: metadata.properties.symbol,
+                decimals: metadata.properties.decimals,
+                totalSupply: metadata.properties.totalSupply.toString(),
                 maxSupply: maxSupply.properties.maximumSupply.toString(),
-                totalSupply: totalSupply.properties.totalSupply.toString(),
             };
         } catch (error) {
             throw new Error(`Failed to fetch token metadata: ${error}`);

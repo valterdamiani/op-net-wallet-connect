@@ -28,7 +28,15 @@
       "network": "Network:",
       "yourTokenData": "Your Token Data",
       "balance": "Balance:",
-      "allowance": "Allowance (Spender):"
+      "allowance": "Allowance (Spender):",
+      "connectingTitle": "Connecting...",
+      "connectingMessage": "Please complete the connection in your wallet",
+      "connectTitle": "Connect Your Wallet",
+      "connectMessage": "Connect to OpNet blockchain and interact with OP_20 tokens",
+      "networkValue": "OpNet Regtest (Chain ID: 12345)",
+      "notConnected": "Not connected",
+      "copyToClipboard": "Copy to clipboard",
+      "copied": "Copied!"
     },
     "transactions": {
       "approve": "Approve Tokens",
@@ -50,7 +58,8 @@
       "failedToLoadMetadata": "Failed to load token metadata",
       "failedToLoadBalance": "Failed to load token balance",
       "failedToApprove": "Failed to approve tokens",
-      "failedToTransfer": "Failed to transfer tokens"
+      "failedToTransfer": "Failed to transfer tokens",
+      "failedToOpenModal": "Failed to open wallet connection modal"
     }
   },
   "features": {

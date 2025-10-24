@@ -1,16 +1,18 @@
 import { useState, useEffect, useMemo } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTranslation } from 'react-i18next';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import HeroSection from '../components/sections/HeroSection';
 import FeaturesSection from '../components/sections/FeaturesSection';
 import AboutSection from '../components/sections/AboutSection';
-import { OP20Service } from '../services/op20Service';
+import { OP20Service, ConnectedData } from '../services/op20Service';
 import { useWalletConnect } from '@btc-vision/walletconnect';
 import { ConnectionState } from '../types/connection';
 
 const MainPage = () => {
+  const { t } = useTranslation();
   const [tokenMetadata, setTokenMetadata] = useState<{
     name: string;
     symbol: string;
@@ -18,6 +20,7 @@ const MainPage = () => {
     maxSupply: string;
     totalSupply: string;
   } | null>(null);
+  const [connectedData, setConnectedData] = useState<ConnectedData | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
   const { address, openConnectModal, disconnect } = useWalletConnect();
@@ -32,7 +35,7 @@ const MainPage = () => {
     } catch (error) {
       console.error('Error opening connect modal:', error);
       setConnectionState(ConnectionState.DISCONNECTED);
-      toast.error('Failed to open wallet connection modal');
+      toast.error(t('main.notifications.failedToOpenModal'));
     }
   };
 
@@ -42,7 +45,7 @@ const MainPage = () => {
       disconnect();
     } catch (error) {
       console.error('Error disconnecting wallet:', error);
-      toast.error('Failed to disconnect wallet');
+      toast.error(t('main.notifications.failedToDisconnect'));
     }
   };
 
@@ -73,12 +76,31 @@ const MainPage = () => {
         console.log('Token metadata loaded successfully', metadata);
       } catch (error) {
         console.error('Error loading token metadata:', error);
-        toast.error('Failed to load token metadata');
+        toast.error(t('main.notifications.failedToLoadMetadata'));
       }
     };
 
     void loadTokenMetadata();
-  }, [op20Service]);
+  }, [op20Service, t]);
+
+  useEffect(() => {
+    const loadConnectedData = async () => {
+      if (isConnected && address) {
+        try {
+          const data = await op20Service.getConectedData();
+          setConnectedData(data);
+          console.log('Connected data loaded successfully', data);
+        } catch (error) {
+          console.error('Error loading connected data:', error);
+          toast.error('Failed to load connected data');
+        }
+      } else {
+        setConnectedData(null);
+      }
+    };
+
+    void loadConnectedData();
+  }, [isConnected, address, op20Service]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-white">
@@ -87,6 +109,7 @@ const MainPage = () => {
       <main className="flex-1">
         <HeroSection
           tokenMetadata={tokenMetadata}
+          connectedData={connectedData}
           isConnected={isConnected}
           connectionState={connectionState}
           connectWallet={handleConnectWallet}
