@@ -1,4 +1,4 @@
-# OP Net Wallet Connect - New-Hire Task
+# OP Net Wallet Connect
 
 A React application that connects wallets using @btc-vision/walletconnect and interacts with OP_20 tokens on the OpNet blockchain. Built with TypeScript, Vite, and Tailwind CSS.
 

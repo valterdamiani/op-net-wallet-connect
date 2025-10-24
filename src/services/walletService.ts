@@ -1,34 +1,10 @@
-const validateEnvironmentVariables = () => {
-  const requiredVars = [
-    'VITE_WALLETCONNECT_PROJECT_ID',
-    'VITE_APP_NAME',
-    'VITE_APP_DESCRIPTION',
-    'VITE_APP_URL',
-    'VITE_APP_ICON',
-    'VITE_OPNET_RPC_URL',
-    'VITE_OPNET_CHAIN_ID',
-    'VITE_OPNET_CHAIN_NAME',
-    'VITE_OPNET_CURRENCY_NAME',
-    'VITE_OPNET_CURRENCY_SYMBOL',
-    'VITE_OPNET_CURRENCY_DECIMALS',
-  ];
-
-  const missingVars = requiredVars.filter(varName => !import.meta.env[varName]);
-  
-  if (missingVars.length > 0) {
-    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}. Please check your .env file.`);
-  }
-};
-
-validateEnvironmentVariables();
-
 const WALLETCONNECT_CONFIG = {
   PROJECT_ID: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
   METADATA: {
-    name: import.meta.env.VITE_APP_NAME,
-    description: import.meta.env.VITE_APP_DESCRIPTION,
-    url: import.meta.env.VITE_APP_URL,
-    icons: [import.meta.env.VITE_APP_ICON],
+    name: import.meta.env.VITE_APP_NAME || 'OP Net Wallet Connect',
+    description: import.meta.env.VITE_APP_DESCRIPTION || 'Connect to OpNet blockchain and interact with OP_20 tokens',
+    url: import.meta.env.VITE_APP_URL || 'https://opnet.org',
+    icons: [import.meta.env.VITE_APP_ICON || 'https://opnet.org/icon.png'],
   },
 };
 

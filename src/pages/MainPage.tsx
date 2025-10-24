@@ -1,52 +1,77 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import OpWalletIcon from '../assets/op-wallet-icon.svg';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { WalletService } from '../services/walletService';
 import type { WalletInfo, TransactionResult } from '../services/walletService';
 import { OP20Service } from '../services/op20Service';
 import type { TokenMetadata, TokenBalance } from '../services/op20Service';
+import useEnvironmentValidation from '../hooks/useEnvironmentValidation';
+import EnvironmentError from '../components/EnvironmentError';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
-const MainPage: React.FC = () => {
+const MainPage = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null);
   const [tokenMetadata, setTokenMetadata] = useState<TokenMetadata | null>(null);
   const [tokenBalance, setTokenBalance] = useState<TokenBalance | null>(null);
   const [transactionResult, setTransactionResult] = useState<TransactionResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const metadataLoadedRef = useRef(false);
+
+  const { isValid, missingVariables } = useEnvironmentValidation();
 
   const walletService = useMemo(() => new WalletService(), []);
   const op20Service = useMemo(() => new OP20Service(), []);
 
-  const loadTokenMetadata = useCallback(async () => {
-    try {
-      setLoading(true);
-      const metadata = await op20Service.getTokenMetadata();
-      setTokenMetadata(metadata);
-    } catch (error) {
-      console.error('Error loading token metadata:', error);
-      setError('Failed to load token metadata');
-    } finally {
-      setLoading(false);
-    }
-  }, [op20Service]);
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   useEffect(() => {
+    console.log('useEffect running, metadataLoadedRef.current:', metadataLoadedRef.current);
+    if (metadataLoadedRef.current) return;
+    metadataLoadedRef.current = true; 
+    
+    const loadTokenMetadata = async () => {
+      console.log('Loading token metadata...');
+      try {
+        setLoading(true);
+        const metadata = await op20Service.getTokenMetadata();
+        setTokenMetadata(metadata);
+        console.log('Token metadata loaded successfully');
+      } catch (error) {
+        console.error('Error loading token metadata:', error);
+        toast.error('Failed to load token metadata');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadTokenMetadata();
-  }, [loadTokenMetadata]);
+  }, [op20Service]);
 
   const connectWallet = async () => {
     try {
       setLoading(true);
-      setError(null);
       
       const walletInfo = await walletService.connect();
       setWalletInfo(walletInfo);
       setIsConnected(true);
       
       await loadUserTokenData(walletInfo.address);
+      toast.success('Wallet connected successfully');
     } catch (error) {
       console.error('Error connecting wallet:', error);
-      setError('Failed to connect wallet. Please try again.');
+      toast.error('Failed to connect wallet. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -59,9 +84,10 @@ const MainPage: React.FC = () => {
       setWalletInfo(null);
       setTokenBalance(null);
       setTransactionResult(null);
+      toast.success('Wallet disconnected successfully');
     } catch (error) {
       console.error('Error disconnecting wallet:', error);
-      setError('Failed to disconnect wallet');
+      toast.error('Failed to disconnect wallet');
     }
   };
 
@@ -69,9 +95,10 @@ const MainPage: React.FC = () => {
     try {
       const balance = await op20Service.getTokenBalance(address);
       setTokenBalance(balance);
+      toast.success('Token balance loaded successfully');
     } catch (error) {
       console.error('Error loading token data:', error);
-      setError('Failed to load token balance');
+      toast.error('Failed to load token balance');
     }
   };
 
@@ -80,7 +107,6 @@ const MainPage: React.FC = () => {
     
     try {
       setLoading(true);
-      setError(null);
       
       const amount = '1000000000000000000'; // 1 token (18 decimals)
       const txHash = await op20Service.approveTokens(walletInfo.address, amount);
@@ -90,10 +116,12 @@ const MainPage: React.FC = () => {
         status: 'pending',
       });
       
+      toast.success(`Tokens approved successfully! Transaction: ${txHash.slice(0, 10)}...`);
+      
       await loadUserTokenData(walletInfo.address);
     } catch (error) {
       console.error('Error approving tokens:', error);
-      setError('Failed to approve tokens');
+      toast.error('Failed to approve tokens');
     } finally {
       setLoading(false);
     }
@@ -104,7 +132,6 @@ const MainPage: React.FC = () => {
     
     try {
       setLoading(true);
-      setError(null);
       
       const toAddress = '0x742d35Cc6634C0532925a3b8D0C0C2C0C0C0C0C0'; // Example recipient
       const amount = '100000000000000000'; 
@@ -115,53 +142,41 @@ const MainPage: React.FC = () => {
         status: 'pending',
       });
       
+      toast.success(`Tokens transferred successfully! Transaction: ${txHash.slice(0, 10)}...`);
+      
       await loadUserTokenData(walletInfo.address);
     } catch (error) {
       console.error('Error transferring tokens:', error);
-      setError('Failed to transfer tokens');
+      toast.error('Failed to transfer tokens');
     } finally {
       setLoading(false);
     }
   };
 
+  if (!isValid) {
+    return <EnvironmentError missingVariables={missingVariables} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-white">
-      <header className="bg-slate-900/95 backdrop-blur-md border-b border-slate-700/50 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img src={OpWalletIcon} alt="OP Net Wallet" className="w-8 h-8" />
-            <h1 className="text-2xl font-bold text-cyan-400">OP Net Wallet Connect</h1>
-          </div>
-          <nav className="flex gap-8">
-            <a href="#home" className="text-slate-300 font-medium hover:text-cyan-400 transition-colors">Home</a>
-            <a href="#features" className="text-slate-300 font-medium hover:text-cyan-400 transition-colors">Features</a>
-            <a href="#about" className="text-slate-300 font-medium hover:text-cyan-400 transition-colors">About</a>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1">
-        <section className="py-16 text-center">
-          <div className="max-w-6xl mx-auto px-8">
+        <section className="py-8 sm:py-16 text-center">
+          <div className="max-w-6xl mx-auto px-4 sm:px-8">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
                 OP_20 Token Interaction
               </h2>
-              <p className="text-xl text-white/90 mb-12 leading-relaxed">
+              <p className="text-lg sm:text-xl text-white/90 mb-8 sm:mb-12 leading-relaxed">
                 Connect your wallet and interact with OP_20 tokens on the OpNet test network.
               </p>
               
-              {error && (
-                <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-6">
-                  {error}
-                </div>
-              )}
 
               {tokenMetadata && (
-                <div className="bg-slate-800/95 backdrop-blur-md p-6 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-slate-700 mb-8">
-                  <h3 className="text-xl font-semibold text-white mb-4">OP_20 Token Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-slate-800/95 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-slate-700 mb-8">
+                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">OP_20 Token Information</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <span className="text-slate-300 text-sm">Name:</span>
                       <p className="text-cyan-400 font-mono">{tokenMetadata.name}</p>
@@ -193,20 +208,20 @@ const MainPage: React.FC = () => {
               <div className="mt-8">
                 {!isConnected ? (
                   <button 
-                    className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-0 px-8 py-4 text-lg font-semibold rounded-xl cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-50"
+                    className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-0 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 w-full sm:w-auto"
                     onClick={connectWallet}
                     disabled={loading}
                   >
                     {loading ? 'Connecting...' : 'Connect Wallet'}
                   </button>
                 ) : (
-                  <div className="bg-slate-800/95 backdrop-blur-md p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-slate-700">
+                  <div className="bg-slate-800/95 backdrop-blur-md p-4 sm:p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-slate-700">
                     <div className="flex items-center gap-2 mb-6">
                       <span className="w-3 h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/50"></span>
                       <span className="font-semibold text-green-400">Connected</span>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
                       <div>
                         <span className="text-slate-300 text-sm">Account:</span>
                         <p className="text-cyan-400 font-mono text-sm">{walletInfo?.address}</p>
@@ -233,18 +248,18 @@ const MainPage: React.FC = () => {
                       </div>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
                       <button
                         onClick={handleApprove}
                         disabled={loading}
-                        className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
+                        className="bg-green-600 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
                       >
                         {loading ? 'Processing...' : 'Approve Tokens'}
                       </button>
                       <button
                         onClick={handleTransfer}
                         disabled={loading}
-                        className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                        className="bg-blue-600 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm sm:text-base"
                       >
                         {loading ? 'Processing...' : 'Transfer Tokens'}
                       </button>
@@ -366,13 +381,21 @@ const MainPage: React.FC = () => {
         </section>
       </main>
 
-      <footer className="bg-slate-900/50 py-8 text-center">
-        <div className="max-w-6xl mx-auto px-8">
-          <p className="text-slate-400">
-            © 2025 OP_Net Wallet Connect. Built with React and Vite.
-          </p>
-        </div>
-      </footer>
+      <Footer />
+          <ToastContainer
+            position={isMobile ? "top-center" : "bottom-right"}
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+            toastClassName="bg-slate-800 border border-slate-600 text-white"
+            className={isMobile ? "!top-4 !left-1/2 !transform !-translate-x-1/2 !w-[calc(100%-2rem)] !max-w-sm" : "!bottom-4 !right-1"}
+          />
     </div>
   );
 };
