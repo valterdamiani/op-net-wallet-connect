@@ -1,15 +1,31 @@
 import { useTranslation } from 'react-i18next';
-import LabelValue from '../LabelValue';
+import TransactionAccordion from '../TransactionAccordion';
+import UserTokenData from '../UserTokenData';
+import TransferSection from './TransferSection';
 import { ConnectionState } from '../../types/connection';
+import { TransactionType, TransactionStatus } from '../../types/transaction';
 import { ConnectedData } from '../../services/op20Service';
+
+interface Transaction {
+  id: string;
+  type: TransactionType;
+  status: TransactionStatus;
+  timestamp: Date;
+  amount?: string;
+  recipient?: string;
+  spender?: string;
+}
 
 interface WalletSectionProps {
   isConnected: boolean;
   connectionState: ConnectionState;
   address: string | null;
   connectedData: ConnectedData | null;
+  transactions: Transaction[];
   disconnectWallet: () => void;
   handleConnectWallet: () => void;
+  onTransfer: (recipient: string, amount: string) => Promise<void>;
+  isTransferring: boolean;
 }
 
 const WalletSection = ({
@@ -17,8 +33,11 @@ const WalletSection = ({
   connectionState,
   address,
   connectedData,
+  transactions,
   disconnectWallet,
   handleConnectWallet,
+  onTransfer,
+  isTransferring,
 }: WalletSectionProps) => {
   const { t } = useTranslation();
 
@@ -35,7 +54,7 @@ const WalletSection = ({
           </div>
         </div>
       )}
-      
+
       {isConnected && connectionState === ConnectionState.CONNECTED && (
         <div className="bg-slate-800/95 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-slate-700 mb-8">
           <div className="flex items-center justify-between mb-6">
@@ -51,43 +70,22 @@ const WalletSection = ({
             </button>
           </div>
 
-          {connectedData && (
-            <div className="bg-slate-700/50 p-4 rounded-lg mb-4">
-              <h4 className="text-lg font-semibold text-white mb-4">{t('main.wallet.yourTokenData')}</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-slate-600/50 p-3 rounded-lg">
-                  <LabelValue 
-                    label={t('main.wallet.account')} 
-                    value={address || ''} 
-                    showCopyButton={true}
-                    isConnected={isConnected}
-                    centered={true}
-                  />
-                </div>
-                <div className="bg-slate-600/50 p-3 rounded-lg">
-                  <LabelValue 
-                    label={t('main.wallet.network')} 
-                    value={connectedData.networkName} 
-                    centered={true}
-                  />
-                </div>
-                <div className="bg-slate-600/50 p-3 rounded-lg">
-                  <LabelValue 
-                    label={t('main.wallet.balance')} 
-                    value={connectedData.userBalance} 
-                    centered={true}
-                  />
-                </div>
-                <div className="bg-slate-600/50 p-3 rounded-lg">
-                  <LabelValue 
-                    label={t('main.wallet.allowance')} 
-                    value={connectedData.allowance} 
-                    centered={true}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+            {connectedData && (
+              <UserTokenData
+                address={address}
+                connectedData={connectedData}
+                isConnected={isConnected}
+              />
+            )}
+          
+          <TransferSection
+            isConnected={isConnected}
+            balance={connectedData?.userBalance || null}
+            onTransfer={onTransfer}
+            isTransferring={isTransferring}
+          />
+          
+          <TransactionAccordion transactions={transactions} />
         </div>
       )}
       {connectionState === ConnectionState.DISCONNECTED && (
@@ -96,7 +94,7 @@ const WalletSection = ({
             <h3 className="text-xl sm:text-2xl font-semibold text-white mb-4">{t('main.wallet.connectTitle')}</h3>
             <p className="text-slate-300 mb-6 text-sm sm:text-base">{t('main.wallet.connectMessage')}</p>
             <button
-              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 w-full sm:w-auto"
+              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 w-full sm:w-auto cursor-pointer"
               onClick={handleConnectWallet}
             >
               <span className="flex items-center justify-center gap-2">

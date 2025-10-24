@@ -39,12 +39,28 @@
       "copied": "Copié !"
     },
     "transactions": {
+      "title": "Transactions Récentes",
       "approve": "Approuver les Tokens",
       "transfer": "Transférer les Tokens",
       "processing": "Traitement...",
       "result": "Résultat de la Transaction",
       "status": "Statut :",
-      "hash": "Hash :"
+      "hash": "Hash :",
+      "noTransactions": "Aucune transaction pour le moment"
+    },
+    "transfer": {
+      "title": "Transférer des Tokens",
+      "recipient": "Adresse du Destinataire :",
+      "amount": "Montant :",
+      "balance": "Votre Solde :",
+      "transfer": "Transférer",
+      "send": "Envoyer les Tokens",
+      "sending": "Envoi en cours...",
+      "cancel": "Annuler",
+      "placeholder": {
+        "recipient": "Entrez l'adresse du destinataire",
+        "amount": "Entrez le montant à transférer"
+      }
     },
     "notifications": {
       "walletConnected": "Portefeuille connecté avec succès",

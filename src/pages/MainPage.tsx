@@ -8,6 +8,17 @@ import HeroSection from '../components/sections/HeroSection';
 import FeaturesSection from '../components/sections/FeaturesSection';
 import AboutSection from '../components/sections/AboutSection';
 import { OP20Service, ConnectedData } from '../services/op20Service';
+import { TransactionType, TransactionStatus } from '../types/transaction';
+
+interface Transaction {
+  id: string;
+  type: TransactionType;
+  status: TransactionStatus;
+  timestamp: Date;
+  amount?: string;
+  recipient?: string;
+  spender?: string;
+}
 import { useWalletConnect } from '@btc-vision/walletconnect';
 import { ConnectionState } from '../types/connection';
 
@@ -21,8 +32,10 @@ const MainPage = () => {
     totalSupply: string;
   } | null>(null);
   const [connectedData, setConnectedData] = useState<ConnectedData | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
+  const [isTransferring, setIsTransferring] = useState(false);
   const { address, openConnectModal, disconnect } = useWalletConnect();
   const op20Service = useMemo(() => new OP20Service(), []);
 
@@ -46,6 +59,39 @@ const MainPage = () => {
     } catch (error) {
       console.error('Error disconnecting wallet:', error);
       toast.error(t('main.notifications.failedToDisconnect'));
+    }
+  };
+
+  const handleTransfer = async (recipient: string, amount: string) => {
+    if (!isConnected) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
+    setIsTransferring(true);
+    try {
+      const txHash = await op20Service.transferTokens(recipient, amount);
+      
+      const newTransaction: Transaction = {
+        id: txHash,
+        type: TransactionType.TRANSFER,
+        status: TransactionStatus.SUCCESS,
+        timestamp: new Date(),
+        amount: amount,
+        recipient: recipient,
+      };
+      
+      setTransactions(prev => [newTransaction, ...prev]);
+      
+      const data = await op20Service.getConectedData();
+      setConnectedData(data);
+      
+      toast.success(t('main.notifications.tokensTransferred', { hash: txHash.substring(0, 10) + '...' }));
+    } catch (error) {
+      console.error('Transfer failed:', error);
+      toast.error(t('main.notifications.failedToTransfer'));
+    } finally {
+      setIsTransferring(false);
     }
   };
 
@@ -102,6 +148,40 @@ const MainPage = () => {
     void loadConnectedData();
   }, [isConnected, address, op20Service]);
 
+  useEffect(() => {
+    if (isConnected) {
+      const sampleTransactions: Transaction[] = [
+        {
+          id: '0x1234567890abcdef1234567890abcdef12345678',
+          type: TransactionType.TRANSFER,
+          status: TransactionStatus.SUCCESS,
+          timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+          amount: '100.5',
+          recipient: '0xabcdef1234567890abcdef1234567890abcdef12'
+        },
+        {
+          id: '0xabcdef1234567890abcdef1234567890abcdef12',
+          type: TransactionType.APPROVE,
+          status: TransactionStatus.PENDING,
+          timestamp: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
+          amount: '50.0',
+          spender: '0x9876543210fedcba9876543210fedcba98765432'
+        },
+        {
+          id: '0x9876543210fedcba9876543210fedcba9876543210',
+          type: TransactionType.TRANSFER,
+          status: TransactionStatus.FAILED,
+          timestamp: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
+          amount: '25.75',
+          recipient: '0x5555555555555555555555555555555555555555'
+        }
+      ];
+      setTransactions(sampleTransactions);
+    } else {
+      setTransactions([]);
+    }
+  }, [isConnected]);
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-white">
       <Header />
@@ -110,11 +190,14 @@ const MainPage = () => {
         <HeroSection
           tokenMetadata={tokenMetadata}
           connectedData={connectedData}
+          transactions={transactions}
           isConnected={isConnected}
           connectionState={connectionState}
           connectWallet={handleConnectWallet}
           address={address ? address.toString() : null}
           disconnectWallet={handleDisconnectWallet}
+          onTransfer={handleTransfer}
+          isTransferring={isTransferring}
         />
         <FeaturesSection />
         <AboutSection />

@@ -41,8 +41,9 @@ export class OP20Service {
     async getConectedData(): Promise<ConnectedData> {
         const op20Contract = await this.getOp20Contract();
         const address = Address.fromString(import.meta.env.VITE_OP20_TOKEN_ADDRESS);
+        const publicKeyInfo = await provider.getPublicKeyInfo(address);
 
-        const userBalance = await op20Contract.balanceOf(address);
+        const userBalance = await op20Contract.balanceOf(publicKeyInfo);
         const allowance = await op20Contract.allowance(address, address);
         const chainId = await this.provider.getChainId();
         const network = await this.provider.getNetwork();
@@ -72,6 +73,20 @@ export class OP20Service {
             };
         } catch (error) {
             throw new Error(`Failed to fetch token metadata: ${error}`);
+        }
+    }
+
+    async transferTokens(recipient: string, amount: string): Promise<string> {
+        const op20Contract = await this.getOp20Contract();
+
+        console.log('recipient', op20Contract);
+        const recipientAddress = Address.fromString(recipient);
+        
+        try {
+            const tx = await op20Contract.transfer(recipientAddress, BigInt(amount), new Uint8Array());
+            return tx.toString();
+        } catch (error) {
+            throw new Error(`Failed to transfer tokens: ${error}`);
         }
     }
 }

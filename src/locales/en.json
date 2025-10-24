@@ -39,12 +39,28 @@
       "copied": "Copied!"
     },
     "transactions": {
+      "title": "Recent Transactions",
       "approve": "Approve Tokens",
       "transfer": "Transfer Tokens",
       "processing": "Processing...",
       "result": "Transaction Result",
       "status": "Status:",
-      "hash": "Hash:"
+      "hash": "Hash:",
+      "noTransactions": "No transactions yet"
+    },
+    "transfer": {
+      "title": "Transfer Tokens",
+      "recipient": "Recipient Address:",
+      "amount": "Amount:",
+      "balance": "Your Balance:",
+      "transfer": "Transfer",
+      "send": "Send Tokens",
+      "sending": "Sending...",
+      "cancel": "Cancel",
+      "placeholder": {
+        "recipient": "Enter recipient address",
+        "amount": "Enter amount to transfer"
+      }
     },
     "notifications": {
       "walletConnected": "Wallet connected successfully",
