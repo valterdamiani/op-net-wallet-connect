@@ -1,0 +1,103 @@
+{
+  "header": {
+    "title": "OP Net Wallet Connect",
+    "nav": {
+      "home": "Home",
+      "features": "Features",
+      "about": "About"
+    }
+  },
+  "main": {
+    "title": "OP_20 Token Interaction",
+    "subtitle": "Connect your wallet and interact with OP_20 tokens on the OpNet test network.",
+    "tokenInfo": {
+      "title": "OP_20 Token Information",
+      "name": "Name:",
+      "symbol": "Symbol:",
+      "decimals": "Decimals:",
+      "maxSupply": "Max Supply:",
+      "totalSupply": "Total Supply:",
+      "address": "Token Address:"
+    },
+    "wallet": {
+      "connect": "Connect Wallet",
+      "connecting": "Connecting...",
+      "connected": "Connected",
+      "disconnect": "Disconnect",
+      "account": "Account:",
+      "network": "Network:",
+      "yourTokenData": "Your Token Data",
+      "balance": "Balance:",
+      "allowance": "Allowance (Spender):"
+    },
+    "transactions": {
+      "approve": "Approve Tokens",
+      "transfer": "Transfer Tokens",
+      "processing": "Processing...",
+      "result": "Transaction Result",
+      "status": "Status:",
+      "hash": "Hash:"
+    },
+    "notifications": {
+      "walletConnected": "Wallet connected successfully",
+      "walletDisconnected": "Wallet disconnected successfully",
+      "tokenMetadataLoaded": "Token metadata loaded successfully",
+      "tokenBalanceLoaded": "Token balance loaded successfully",
+      "tokensApproved": "Tokens approved successfully! Transaction: {{hash}}...",
+      "tokensTransferred": "Tokens transferred successfully! Transaction: {{hash}}...",
+      "failedToConnect": "Failed to connect wallet. Please try again.",
+      "failedToDisconnect": "Failed to disconnect wallet",
+      "failedToLoadMetadata": "Failed to load token metadata",
+      "failedToLoadBalance": "Failed to load token balance",
+      "failedToApprove": "Failed to approve tokens",
+      "failedToTransfer": "Failed to transfer tokens"
+    }
+  },
+  "features": {
+    "title": "New-Hire Task Features",
+    "walletConnect": {
+      "title": "WalletConnect Integration",
+      "description": "Connect wallet using @btc-vision/walletconnect with account and network display"
+    },
+    "tokenMetadata": {
+      "title": "Token Metadata",
+      "description": "Display OP_20 token metadata: name, symbol, decimals, maxSupply, totalSupply"
+    },
+    "balanceAllowance": {
+      "title": "Balance & Allowance",
+      "description": "Show user balance and allowance for configured spender when connected"
+    },
+    "transactions": {
+      "title": "Transactions",
+      "description": "Execute approve and transfer transactions with tx hash and status display"
+    },
+    "opnetTestnet": {
+      "title": "OpNet Testnet",
+      "description": "Configured for OpNet test network with known OP_20 token address"
+    },
+    "secure": {
+      "title": "Secure",
+      "description": "Your private keys never leave your wallet"
+    }
+  },
+  "about": {
+    "title": "About OpNet",
+    "description": "OpNet is a next-generation blockchain network that provides fast, secure, and efficient transactions. Built with advanced consensus mechanisms, OpNet enables developers to build scalable applications with native OP_20 token support and seamless wallet integration.",
+    "network": "Network:",
+    "chainId": "Chain ID:",
+    "rpcUrl": "RPC URL:",
+    "tokenStandard": "Token Standard:",
+    "networkValue": "OpNet Mainnet",
+    "chainIdValue": "TBD",
+    "rpcUrlValue": "https://mainnet.opnet.org",
+    "tokenStandardValue": "OP_20"
+  },
+  "footer": {
+    "copyright": "© 2025 OP_Net Wallet Connect. Built with React and Vite."
+  },
+  "language": {
+    "select": "Select Language",
+    "english": "English",
+    "french": "Français"
+  }
+}

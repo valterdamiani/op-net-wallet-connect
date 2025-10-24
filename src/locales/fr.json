@@ -1,0 +1,103 @@
+{
+  "header": {
+    "title": "OP Net Wallet Connect",
+    "nav": {
+      "home": "Accueil",
+      "features": "Fonctionnalités",
+      "about": "À propos"
+    }
+  },
+  "main": {
+    "title": "Interaction avec le Token OP_20",
+    "subtitle": "Connectez votre portefeuille et interagissez avec les tokens OP_20 sur le réseau de test OpNet.",
+    "tokenInfo": {
+      "title": "Informations du Token OP_20",
+      "name": "Nom :",
+      "symbol": "Symbole :",
+      "decimals": "Décimales :",
+      "maxSupply": "Approvisionnement Maximum :",
+      "totalSupply": "Approvisionnement Total :",
+      "address": "Adresse du Token :"
+    },
+    "wallet": {
+      "connect": "Connecter le Portefeuille",
+      "connecting": "Connexion...",
+      "connected": "Connecté",
+      "disconnect": "Déconnecter",
+      "account": "Compte :",
+      "network": "Réseau :",
+      "yourTokenData": "Vos Données de Token",
+      "balance": "Solde :",
+      "allowance": "Autorisation (Spender) :"
+    },
+    "transactions": {
+      "approve": "Approuver les Tokens",
+      "transfer": "Transférer les Tokens",
+      "processing": "Traitement...",
+      "result": "Résultat de la Transaction",
+      "status": "Statut :",
+      "hash": "Hash :"
+    },
+    "notifications": {
+      "walletConnected": "Portefeuille connecté avec succès",
+      "walletDisconnected": "Portefeuille déconnecté avec succès",
+      "tokenMetadataLoaded": "Métadonnées du token chargées avec succès",
+      "tokenBalanceLoaded": "Solde du token chargé avec succès",
+      "tokensApproved": "Tokens approuvés avec succès ! Transaction : {{hash}}...",
+      "tokensTransferred": "Tokens transférés avec succès ! Transaction : {{hash}}...",
+      "failedToConnect": "Échec de la connexion du portefeuille. Veuillez réessayer.",
+      "failedToDisconnect": "Échec de la déconnexion du portefeuille",
+      "failedToLoadMetadata": "Échec du chargement des métadonnées du token",
+      "failedToLoadBalance": "Échec du chargement du solde du token",
+      "failedToApprove": "Échec de l'approbation des tokens",
+      "failedToTransfer": "Échec du transfert des tokens"
+    }
+  },
+  "features": {
+    "title": "Fonctionnalités de la Tâche Nouvel Employé",
+    "walletConnect": {
+      "title": "Intégration WalletConnect",
+      "description": "Connecter le portefeuille en utilisant @btc-vision/walletconnect avec affichage du compte et du réseau"
+    },
+    "tokenMetadata": {
+      "title": "Métadonnées du Token",
+      "description": "Afficher les métadonnées du token OP_20 : nom, symbole, décimales, maxSupply, totalSupply"
+    },
+    "balanceAllowance": {
+      "title": "Solde et Autorisation",
+      "description": "Afficher le solde de l'utilisateur et l'autorisation pour le spender configuré quand connecté"
+    },
+    "transactions": {
+      "title": "Transactions",
+      "description": "Exécuter les transactions d'approbation et de transfert avec hash de tx et affichage du statut"
+    },
+    "opnetTestnet": {
+      "title": "OpNet Testnet",
+      "description": "Configuré pour le réseau de test OpNet avec une adresse de token OP_20 connue"
+    },
+    "secure": {
+      "title": "Sécurisé",
+      "description": "Vos clés privées ne quittent jamais votre portefeuille"
+    }
+  },
+  "about": {
+    "title": "À propos d'OpNet",
+    "description": "OpNet est un réseau blockchain de nouvelle génération qui fournit des transactions rapides, sécurisées et efficaces. Construit avec des mécanismes de consensus avancés, OpNet permet aux développeurs de créer des applications évolutives avec support natif des tokens OP_20 et intégration transparente des portefeuilles.",
+    "network": "Réseau :",
+    "chainId": "ID de Chaîne :",
+    "rpcUrl": "URL RPC :",
+    "tokenStandard": "Standard de Token :",
+    "networkValue": "OpNet Mainnet",
+    "chainIdValue": "TBD",
+    "rpcUrlValue": "https://mainnet.opnet.org",
+    "tokenStandardValue": "OP_20"
+  },
+  "footer": {
+    "copyright": "© 2025 OP_Net Wallet Connect. Construit avec React et Vite."
+  },
+  "language": {
+    "select": "Sélectionner la Langue",
+    "english": "English",
+    "french": "Français"
+  }
+}
