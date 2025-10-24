@@ -12,7 +12,7 @@ const Header = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <img src={OpWalletIcon} alt={t('header.title')} className="w-8 h-8" />
-          <h1 className="text-xl sm:text-2xl font-bold text-cyan-400">{t('header.title')}</h1>
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-cyan-400">{t('header.title')}</h1>
         </div>
         
         <div className="flex items-center gap-4">
