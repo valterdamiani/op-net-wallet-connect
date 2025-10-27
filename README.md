@@ -59,51 +59,10 @@ npx tsc --noEmit     # Type check without emitting files
 ```
 
 ## 🔧 Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```bash
-# OpNet Test Network Configuration
-VITE_OPNET_RPC_URL=regtest.opnet.org
-VITE_OPNET_CHAIN_ID=12345
-VITE_OPNET_CHAIN_NAME=OpNet Testnet
-VITE_OPNET_CURRENCY_NAME=OpNet
-VITE_OPNET_CURRENCY_SYMBOL=OP
-VITE_OPNET_CURRENCY_DECIMALS=18
-
-# OP_20 Token Configuration
-# Primary token address
-VITE_OP20_TOKEN_ADDRESS=your-token-address-here
-# Spender address for allowance checks
-VITE_OP20_SPENDER_ADDRESS=your-spender-address-here
-
-# Test Tokens on OpNet Testnet
-# MOTO Token
-VITE_MOTO_TOKEN=your-moto-token-address-here
-
-# ODYSSEY Token
-VITE_ODYSSEY_TOKEN=your-odyssey-token-address-here
-
-# PILL Token
-VITE_PILL_TOKEN=your-pill-token-address-here
-
-# WalletConnect Configuration
-# Get your project ID from https://cloud.walletconnect.com/
-VITE_WALLETCONNECT_PROJECT_ID=your-walletconnect-project-id
-
-# Application Configuration
-VITE_APP_NAME=OP Net Wallet Connect
-VITE_APP_DESCRIPTION=Connect to OpNet blockchain and interact with OP_20 tokens
-VITE_APP_URL=https://opnet.org
-VITE_APP_ICON=https://opnet.org/icon.png
-```
-
-### Security Notes
 - **Never commit secrets**: The `.env` file is gitignored
 - **Use .env.example**: Template provided for required keys
 - **WalletConnect Project ID**: Get from [WalletConnect Cloud](https://cloud.walletconnect.com/)
 - **Test Network Only**: This app is configured for OpNet testnet
-- **Token Addresses**: Keep actual token addresses in environment variables
 
 ## 🎯 Features
 
@@ -174,9 +133,6 @@ npm run dev
 
 # Build for production
 npm run build
-
-# Preview production build
-npm run preview
 ```
 
 ## 📱 Usage
@@ -191,34 +147,31 @@ npm run preview
 
 **Repository URL**: `https://github.com/valterdamiani/op-net-wallet-connect`
 
+
 ## 🛠️ OpNet Utilities & Resources
 
 ### Network Resources
+
 - **RPC URL**: `regtest.opnet.org`
 - **Faucet**: [https://faucet.opnet.org](https://faucet.opnet.org) - Get test tokens
 - **Block Explorer**: [https://opscan.org](https://opscan.org) - View transactions and blocks
 
 ### Development Tools
+
 - **WalletConnect**: [@btc-vision/walletconnect](https://www.npmjs.com/package/@btc-vision/walletconnect?activeTab=readme) - Wallet connection library
 - **Documentation**: [https://docs.opnet.org](https://docs.opnet.org) - Official OpNet documentation
 
-### Getting Started with OpNet
-1. **Get Test Tokens**: Visit the faucet to get test OP tokens
-2. **Configure Wallet**: Add OpNet network to your wallet
-3. **Explore Transactions**: Use OP_SCAN to view your transactions
-4. **Read Documentation**: Check the official docs for detailed information
-
 ## 📹 Demo Recording
 
-**Demo Video**: `/docs/demo.mp4`
+<!-- **Demo Video**: `/docs/demo.mp4` -->
 
-The demo showcases:
+<!-- The demo showcases:
 1. Token metadata display when disconnected
 2. Wallet connection process
 3. Balance and allowance display
 4. Transaction execution (approve/transfer)
 5. Transaction result display
-6. Error handling scenarios
+6. Error handling scenarios -->
 
 ## 📄 License
 
