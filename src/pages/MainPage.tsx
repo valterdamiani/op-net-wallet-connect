@@ -36,26 +36,26 @@ const MainPage = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
   const [isTransferring, setIsTransferring] = useState(false);
-  const { address, openConnectModal, disconnect } = useWalletConnect();
+  const {address, openConnectModal, disconnect, publicKey } = useWalletConnect();
   const op20Service = useMemo(() => new OP20Service(), []);
 
   const isConnected = !!address;
 
-  const handleConnectWallet = () => {
+  const handleConnectWallet = async () => {
     try {
       setConnectionState(ConnectionState.CONNECTING);
-      openConnectModal();
+      await openConnectModal();
     } catch (error) {
-      console.error('Error opening connect modal:', error);
+      console.error('Error connecting wallet:', error);
       setConnectionState(ConnectionState.DISCONNECTED);
       toast.error(t('main.notifications.failedToOpenModal'));
     }
   };
 
-  const handleDisconnectWallet = () => {
+  const handleDisconnectWallet = async () => {
     try {
       setConnectionState(ConnectionState.DISCONNECTED);
-      disconnect();
+      await disconnect();
     } catch (error) {
       console.error('Error disconnecting wallet:', error);
       toast.error(t('main.notifications.failedToDisconnect'));
@@ -68,10 +68,15 @@ const MainPage = () => {
       return;
     }
 
+    if (!address) {
+      toast.error('Wallet address not available');
+      return;
+    }
+
     setIsTransferring(true);
     try {
-      const txHash = await op20Service.transferTokens(recipient, amount);
-      
+      const txHash = await op20Service.transferTokens(recipient, amount, address.toString());
+console.log('txHash', txHash);
       const newTransaction: Transaction = {
         id: txHash,
         type: TransactionType.TRANSFER,
@@ -80,12 +85,15 @@ const MainPage = () => {
         amount: amount,
         recipient: recipient,
       };
-      
+
       setTransactions(prev => [newTransaction, ...prev]);
-      
-      const data = await op20Service.getConectedData();
+
+      if (!publicKey) {
+        throw new Error('Public key not available');
+      }
+      const data = await op20Service.getConectedData(publicKey);
       setConnectedData(data);
-      
+
       toast.success(t('main.notifications.tokensTransferred', { hash: txHash.substring(0, 10) + '...' }));
     } catch (error) {
       console.error('Transfer failed:', error);
@@ -133,7 +141,10 @@ const MainPage = () => {
     const loadConnectedData = async () => {
       if (isConnected && address) {
         try {
-          const data = await op20Service.getConectedData();
+          if (!publicKey) {
+            throw new Error('Public key not available');
+          }
+          const data = await op20Service.getConectedData(publicKey);
           setConnectedData(data);
           console.log('Connected data loaded successfully', data);
         } catch (error) {
@@ -146,7 +157,7 @@ const MainPage = () => {
     };
 
     void loadConnectedData();
-  }, [isConnected, address, op20Service]);
+  }, [isConnected, address, publicKey, op20Service]);
 
   useEffect(() => {
     if (isConnected) {

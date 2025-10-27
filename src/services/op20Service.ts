@@ -23,7 +23,7 @@ export interface ConnectedData {
 }
 
 export class OP20Service {
-  private provider: JSONRpcProvider;
+    private provider: JSONRpcProvider;
 
     constructor() {
         this.provider = provider;
@@ -38,16 +38,35 @@ export class OP20Service {
         );
     }
 
-    async getConectedData(): Promise<ConnectedData> {
-        const op20Contract = await this.getOp20Contract();
-        const address = Address.fromString(import.meta.env.VITE_OP20_TOKEN_ADDRESS);
-        const publicKeyInfo = await provider.getPublicKeyInfo(address);
+    async getOp20ContractWithSigner(senderAddress: string): Promise<IOP20Contract> {
+        if (!senderAddress) {
+            throw new Error('Sender address is required for contract operations');
+        }
+        
+        const sender = Address.fromString(senderAddress);
+        return await getContract<IOP20Contract>(
+            import.meta.env.VITE_OP20_TOKEN_ADDRESS,
+            OP_20_ABI,
+            this.provider,
+            networks.regtest,
+            sender
+        );
+    }
 
-        const userBalance = await op20Contract.balanceOf(publicKeyInfo);
-        const allowance = await op20Contract.allowance(address, address);
+    async getConectedData(publicKey: string): Promise<ConnectedData> {
+        if (!publicKey) {
+            throw new Error('Public key is required to get connected data');
+        }
+        const address = Address.fromString(publicKey);
+
+        const publicKeyInfo = await provider.getPublicKeyInfo(address);
         const chainId = await this.provider.getChainId();
         const network = await this.provider.getNetwork();
 
+        const op20Contract = await this.getOp20Contract();
+        const userBalance = await op20Contract.balanceOf(publicKeyInfo);
+        const allowance = await op20Contract.allowance(address, address);
+  
         const networkName = network.messagePrefix + ' ( Chain ID: ' + chainId.toString() + ')';
 
         return {
@@ -62,7 +81,7 @@ export class OP20Service {
 
         const metadata = await op20Contract.metadata();
         const maxSupply = await op20Contract.maximumSupply();
-        
+
         try {
             return {
                 name: metadata.properties.name,
@@ -76,14 +95,13 @@ export class OP20Service {
         }
     }
 
-    async transferTokens(recipient: string, amount: string): Promise<string> {
-        const op20Contract = await this.getOp20Contract();
-
-        console.log('recipient', op20Contract);
+    async transferTokens(recipient: string, amount: string, senderAddress: string): Promise<string> {
+        const op20Contract = await this.getOp20ContractWithSigner(senderAddress);
         const recipientAddress = Address.fromString(recipient);
-        
+
         try {
-            const tx = await op20Contract.transfer(recipientAddress, BigInt(amount), new Uint8Array());
+            const tx = await op20Contract.transfer(recipientAddress, BigInt(amount));
+            console.log('tx', tx);
             return tx.toString();
         } catch (error) {
             throw new Error(`Failed to transfer tokens: ${error}`);
