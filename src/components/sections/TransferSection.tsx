@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { Address } from '../../types/types';
 interface TransferSectionProps {
+  address: Address;
   isConnected: boolean;
   balance: string | null;
-  onTransfer: (recipient: string, amount: string) => Promise<void>;
+  onTransfer: (recipient: string, amount: string, address: Address) => Promise<void>;
   isTransferring: boolean;
 }
 
 const TransferSection = ({
+  address,
   isConnected,
   onTransfer,
   isTransferring,
@@ -23,7 +25,7 @@ const TransferSection = ({
     if (!recipient || !amount || !isConnected) return;
     
     try {
-      await onTransfer(recipient, amount);
+      await onTransfer(recipient, amount, address);
       setRecipient('');
       setAmount('');
     } catch (error) {
@@ -36,7 +38,7 @@ const TransferSection = ({
   }
 
   return (
-    <div className="mb-6">
+    <div className="mb-6" data-testid="transfer-section">
       <h3 className="text-lg sm:text-xl font-semibold text-white mb-6 text-center">{t('main.transfer.title')}</h3>
       {!showTransferForm ? (
         <div className="flex justify-center">
@@ -62,6 +64,7 @@ const TransferSection = ({
               <input
                 type="text"
                 id="recipient"
+                data-testid="recipient-input"
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
                 placeholder={t('main.transfer.placeholder.recipient')}
@@ -76,6 +79,7 @@ const TransferSection = ({
               <input
                 type="number"
                 id="amount"
+                data-testid="amount-input"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder={t('main.transfer.placeholder.amount')}

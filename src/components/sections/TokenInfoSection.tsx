@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import LabelValue from '../LabelValue';
+import { Address } from '../../types/types';
 
 interface TokenInfoSectionProps {
   tokenMetadata: {
@@ -9,7 +10,7 @@ interface TokenInfoSectionProps {
     maxSupply: string;
     totalSupply: string;
   };
-  address: string | null;
+  address: Address;
   isConnected: boolean;
 }
 

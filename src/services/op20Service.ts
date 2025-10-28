@@ -1,12 +1,11 @@
-import { getContract, IOP20Contract, OP_20_ABI, JSONRpcProvider } from "opnet";
+import { getContract, IOP20Contract, OP_20_ABI, JSONRpcProvider, TransactionParameters, BitcoinUtils } from "opnet";
 import { networks } from "@btc-vision/bitcoin";
-import { Address } from "@btc-vision/transaction";
+import { Address, AddressVerificator } from "@btc-vision/transaction";
 
-const url = "https://regtest.opnet.org";
 const network = networks.regtest;
 const timeout = 10000; // 10 seconds
 
-const provider = new JSONRpcProvider(url, network, timeout);
+const provider = new JSONRpcProvider(import.meta.env.VITE_OPNET_RPC_URL, network, timeout);
 
 export interface TokenMetadata {
     name: string;
@@ -31,25 +30,10 @@ export class OP20Service {
 
     async getOp20Contract(): Promise<IOP20Contract> {
         return await getContract<IOP20Contract>(
-            import.meta.env.VITE_OP20_TOKEN_ADDRESS,
+            import.meta.env.VITE_MOTO_TOKEN,
             OP_20_ABI,
             this.provider,
             networks.regtest
-        );
-    }
-
-    async getOp20ContractWithSigner(senderAddress: string): Promise<IOP20Contract> {
-        if (!senderAddress) {
-            throw new Error('Sender address is required for contract operations');
-        }
-        
-        const sender = Address.fromString(senderAddress);
-        return await getContract<IOP20Contract>(
-            import.meta.env.VITE_OP20_TOKEN_ADDRESS,
-            OP_20_ABI,
-            this.provider,
-            networks.regtest,
-            sender
         );
     }
 
@@ -66,7 +50,7 @@ export class OP20Service {
         const op20Contract = await this.getOp20Contract();
         const userBalance = await op20Contract.balanceOf(publicKeyInfo);
         const allowance = await op20Contract.allowance(address, address);
-  
+
         const networkName = network.messagePrefix + ' ( Chain ID: ' + chainId.toString() + ')';
 
         return {
@@ -79,15 +63,16 @@ export class OP20Service {
     async getTokenMetadata(): Promise<TokenMetadata> {
         const op20Contract = await this.getOp20Contract();
 
-        const metadata = await op20Contract.metadata();
         const maxSupply = await op20Contract.maximumSupply();
+        const metadata = await op20Contract.metadata();
+        const { name, symbol, decimals, totalSupply } = metadata.properties;
 
         try {
             return {
-                name: metadata.properties.name,
-                symbol: metadata.properties.symbol,
-                decimals: metadata.properties.decimals,
-                totalSupply: metadata.properties.totalSupply.toString(),
+                name: name,
+                symbol: symbol,
+                decimals: decimals,
+                totalSupply: totalSupply.toString(),
                 maxSupply: maxSupply.properties.maximumSupply.toString(),
             };
         } catch (error) {
@@ -95,16 +80,50 @@ export class OP20Service {
         }
     }
 
-    async transferTokens(recipient: string, amount: string, senderAddress: string): Promise<string> {
-        const op20Contract = await this.getOp20ContractWithSigner(senderAddress);
-        const recipientAddress = Address.fromString(recipient);
+    async safeTransferTokens(walletAddress: string, inputAddress: string, amountString: string, address: Address) {
+        const motoContractAddress: Address = Address.fromString(import.meta.env.VITE_MOTO_TOKEN);
+        const walletAddressPublicKeyInfo = await provider.getPublicKeyInfo(walletAddress);
 
-        try {
-            const tx = await op20Contract.transfer(recipientAddress, BigInt(amount));
-            console.log('tx', tx);
-            return tx.toString();
-        } catch (error) {
-            throw new Error(`Failed to transfer tokens: ${error}`);
+        const motoContract: IOP20Contract = getContract<IOP20Contract>(
+            motoContractAddress,
+            OP_20_ABI,
+            provider,
+            network,
+            walletAddressPublicKeyInfo,
+        );
+
+        const tokenMetadata = await motoContract.metadata();
+        const decimals: number = tokenMetadata.properties.decimals;
+        const amount: bigint = BitcoinUtils.expandToDecimals(amountString, decimals);
+
+        if (inputAddress) {
+            let receiverAddress: Address;
+
+            if (AddressVerificator.isValidPublicKey(inputAddress, network!)) {
+                receiverAddress = Address.fromString(inputAddress);
+            } else {
+                const inputAddressType = AddressVerificator.detectAddressType(inputAddress, network!);
+                if (inputAddressType === null) {
+                    throw new Error('Invalid address provided');
+                }
+                receiverAddress = await provider!.getPublicKeyInfo(inputAddress);
+            }
+
+            const tokenTransfer = await motoContract.safeTransfer(receiverAddress, amount, new Uint8Array());
+
+            if (tokenTransfer.revert) {
+                throw new Error(`Transfer simulation failed: ${tokenTransfer.revert}`);
+            }
+
+            const params: TransactionParameters = {
+                refundTo: walletAddress,
+                maximumAllowedSatToSpend: 1000n,
+                feeRate: 0, // zero makes it automatic
+                network: network,
+                from: address,
+            };
+
+            return await tokenTransfer.sendTransaction(params);
         }
     }
 }

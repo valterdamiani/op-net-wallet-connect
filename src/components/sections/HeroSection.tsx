@@ -1,19 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import WalletSection from './WalletSection';
 import TokenInfoSection from './TokenInfoSection';
-import { ConnectionState } from '../../types/connection';
-import { TransactionType, TransactionStatus } from '../../types/transaction';
+import { ConnectionState, Address } from '../../types/types';
 import { ConnectedData } from '../../services/op20Service';
-
-interface Transaction {
-  id: string;
-  type: TransactionType;
-  status: TransactionStatus;
-  timestamp: Date;
-  amount?: string;
-  recipient?: string;
-  spender?: string;
-}
 
 interface HeroSectionProps {
   tokenMetadata: {
@@ -24,20 +13,18 @@ interface HeroSectionProps {
     totalSupply: string;
   } | null;
   connectedData: ConnectedData | null;
-  transactions: Transaction[];
-  address: string | null;
+  address: Address;
   isConnected: boolean;
   connectionState: ConnectionState;
   connectWallet: () => void;
   disconnectWallet: () => void;
-  onTransfer: (recipient: string, amount: string) => Promise<void>;
+  onTransfer: (recipient: string, amount: string, address: Address) => Promise<void>;
   isTransferring: boolean;
 }
 
 const HeroSection = ({
   tokenMetadata,
   connectedData,
-  transactions,
   address,
   isConnected,
   connectionState,
@@ -49,34 +36,37 @@ const HeroSection = ({
   const { t } = useTranslation();
 
   return (
-    <section className="py-8 sm:py-16 text-center">
+    <section className="py-8 sm:py-16 text-center" data-testid="hero-section">
       <div className="max-w-6xl mx-auto px-4 sm:px-8">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight" data-testid="hero-title">
             {t('main.title')}
           </h2>
-          <p className="text-lg sm:text-xl text-white/90 mb-8 sm:mb-12 leading-relaxed">
+          <p className="text-lg sm:text-xl text-white/90 mb-8 sm:mb-12 leading-relaxed" data-testid="hero-subtitle">
             {t('main.subtitle')}
           </p>
 
-        <WalletSection 
-          isConnected={isConnected} 
-          connectionState={connectionState}
-          address={address}
-          connectedData={connectedData}
-          transactions={transactions}
-          disconnectWallet={disconnectWallet}
-          handleConnectWallet={connectWallet}
-          onTransfer={onTransfer}
-          isTransferring={isTransferring}
-        />
+        <div data-testid="wallet-section">
+          <WalletSection 
+            isConnected={isConnected} 
+            connectionState={connectionState}
+            address={address}
+            connectedData={connectedData}
+            disconnectWallet={disconnectWallet}
+            handleConnectWallet={connectWallet}
+            onTransfer={onTransfer}
+            isTransferring={isTransferring}
+          />
+        </div>
 
           {tokenMetadata && (
-            <TokenInfoSection
-              tokenMetadata={tokenMetadata}
-              address={address}
-              isConnected={isConnected}
-            />
+            <div data-testid="token-info-section">
+              <TokenInfoSection
+                tokenMetadata={tokenMetadata}
+                address={address}
+                isConnected={isConnected}
+              />
+            </div>
           )}
 
         </div>

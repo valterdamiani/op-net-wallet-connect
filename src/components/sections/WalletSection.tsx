@@ -1,30 +1,17 @@
 import { useTranslation } from 'react-i18next';
-import TransactionAccordion from '../TransactionAccordion';
 import UserTokenData from '../UserTokenData';
 import TransferSection from './TransferSection';
-import { ConnectionState } from '../../types/connection';
-import { TransactionType, TransactionStatus } from '../../types/transaction';
+import { ConnectionState, Address } from '../../types/types';
 import { ConnectedData } from '../../services/op20Service';
-
-interface Transaction {
-  id: string;
-  type: TransactionType;
-  status: TransactionStatus;
-  timestamp: Date;
-  amount?: string;
-  recipient?: string;
-  spender?: string;
-}
 
 interface WalletSectionProps {
   isConnected: boolean;
   connectionState: ConnectionState;
-  address: string | null;
+  address: Address;
   connectedData: ConnectedData | null;
-  transactions: Transaction[];
   disconnectWallet: () => void;
   handleConnectWallet: () => void;
-  onTransfer: (recipient: string, amount: string) => Promise<void>;
+  onTransfer: (recipient: string, amount: string, address: Address) => Promise<void>;
   isTransferring: boolean;
 }
 
@@ -33,11 +20,10 @@ const WalletSection = ({
   connectionState,
   address,
   connectedData,
-  transactions,
+  isTransferring,
   disconnectWallet,
   handleConnectWallet,
   onTransfer,
-  isTransferring,
 }: WalletSectionProps) => {
   const { t } = useTranslation();
 
@@ -79,13 +65,12 @@ const WalletSection = ({
             )}
           
           <TransferSection
+            address={address}
             isConnected={isConnected}
             balance={connectedData?.userBalance || null}
             onTransfer={onTransfer}
             isTransferring={isTransferring}
           />
-          
-          <TransactionAccordion transactions={transactions} />
         </div>
       )}
       {connectionState === ConnectionState.DISCONNECTED && (
