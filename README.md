@@ -148,15 +148,15 @@ npm run build
 
 ## 📹 Demo Recording
 
-<!-- **Demo Video**: `/docs/demo.mp4` -->
+**Demo Video**: `/docs/demo.mp4`
 
-<!-- The demo showcases:
+The demo showcases:
 1. Token metadata display when disconnected
 2. Wallet connection process
-3. Balance and allowance display
-4. Transaction execution (approve/transfer)
+3. Balance display
+4. Transaction execution (transfer)
 5. Transaction result display
-6. Error handling scenarios -->
+6. Error handling scenarios
 
 ## 📄 License
 
