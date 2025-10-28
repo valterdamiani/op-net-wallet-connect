@@ -49,7 +49,7 @@ const TransactionModal = ({ isOpen, onClose, transactionHash, status, errorMessa
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-slate-800 rounded-lg p-6 max-w-md w-full mx-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">{t('main.transactions.modal.title')}</h3>
+          <h3 className="text-lg font-semibold text-white" data-testid="transaction-modal-title">{t('main.transactions.modal.title')}</h3>
           <button
             onClick={onClose}
             className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-700/50 hover:bg-gray-600/70 text-gray-300 hover:text-white transition-all duration-200 hover:scale-105"

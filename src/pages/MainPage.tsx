@@ -141,7 +141,7 @@ const MainPage = () => {
           if (!publicKey) {
             throw new Error(t('main.notifications.publicKeyNotAvailable'));
           }
-          const data = await op20Service.getConectedData(publicKey);
+          const data = await op20Service.getConnectedData(publicKey);
           setConnectedData(data);
         } catch (error) {
           toast.error(t('main.notifications.failedToLoadConnectedData', { error: error }));

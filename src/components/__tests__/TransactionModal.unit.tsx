@@ -9,11 +9,11 @@ describe('TransactionModal', () => {
 
   it('renders modal when open', () => {
     render(<TransactionModal isOpen={true} onClose={mockOnClose} transactionHash="0x123" status={TransactionStatus.SUCCESS} />)
-    expect(screen.getByText('main.transactions.modal.title')).toBeInTheDocument()
+    expect(screen.getByTestId('transaction-modal-title')).toBeInTheDocument()
   })
 
   it('does not render when closed', () => {
     render(<TransactionModal isOpen={false} onClose={mockOnClose} transactionHash="0x123" status={TransactionStatus.SUCCESS} />)
-    expect(screen.queryByText('main.transactions.modal.title')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('transaction-modal-title')).not.toBeInTheDocument()
   })
 })

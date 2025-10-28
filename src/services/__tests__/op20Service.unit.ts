@@ -34,7 +34,7 @@ describe('OP20Service', () => {
   it('has required methods', () => {
     const service = new OP20Service()
     expect(typeof service.getOp20Contract).toBe('function')
-    expect(typeof service.getConectedData).toBe('function')
+    expect(typeof service.getConnectedData).toBe('function')
     expect(typeof service.getTokenMetadata).toBe('function')
     expect(typeof service.safeTransferTokens).toBe('function')
   })

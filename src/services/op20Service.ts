@@ -37,7 +37,7 @@ export class OP20Service {
         );
     }
 
-    async getConectedData(publicKey: string): Promise<ConnectedData> {
+    async getConnectedData(publicKey: string): Promise<ConnectedData> {
         if (!publicKey) {
             throw new Error('Public key is required to get connected data');
         }

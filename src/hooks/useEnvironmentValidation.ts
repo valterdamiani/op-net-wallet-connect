@@ -13,10 +13,10 @@ const useEnvironmentValidation = (): ValidationResult => {
 
   useEffect(() => {
     const validateEnvironment = () => {
-    const requiredVars = [
-      'VITE_OPNET_RPC_URL',
-      'VITE_MOTO_TOKEN',
-    ];
+      const requiredVars = [
+        'VITE_OPNET_RPC_URL',
+        'VITE_MOTO_TOKEN',
+      ];
 
       const missingVars = requiredVars.filter(varName => !import.meta.env[varName]);
       
