@@ -7,9 +7,10 @@ import Header from '../components/Header';
 import HeroSection from '../components/sections/HeroSection';
 import FeaturesSection from '../components/sections/FeaturesSection';
 import AboutSection from '../components/sections/AboutSection';
+import TransactionModal from '../components/TransactionModal';
 import { OP20Service, ConnectedData } from '../services/op20Service';
 import { useWalletConnect } from '@btc-vision/walletconnect';
-import { ConnectionState, Address } from '../types/types';
+import { ConnectionState, Address, TransactionStatus, TransactionModalState } from '../types/types';
 
 const MainPage = () => {
   const { t } = useTranslation();
@@ -26,10 +27,24 @@ const MainPage = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
   const [isTransferring, setIsTransferring] = useState(false);
+  const [transactionModal, setTransactionModal] = useState<TransactionModalState>({
+    isOpen: false,
+    transactionHash: '',
+    status: TransactionStatus.PENDING
+  });
 
   const op20Service = useMemo(() => new OP20Service(), []);
 
   const isConnected = !!address;
+
+  const closeTransactionModal = () => {
+    setTransactionModal({
+      isOpen: false,
+      transactionHash: '',
+      status: TransactionStatus.PENDING,
+      errorMessage: undefined
+    });
+  };
 
   const handleConnectWallet = async () => {
     try {
@@ -61,9 +76,27 @@ const MainPage = () => {
 
     try {
       const transaction = await op20Service.safeTransferTokens(walletAddress, inputAddress, amountString, address);
-      console.log('transaction', transaction);
+      
+      const transactionHash = transaction?.transactionId || t('main.notifications.unknownTransactionHash');
+
+      setTransactionModal({
+        isOpen: true,
+        transactionHash: transactionHash,
+        status: TransactionStatus.SUCCESS
+      });
+
+      toast.success(t('main.notifications.tokensTransferred', { hash: transactionHash.substring(0, 10) }));
       setIsTransferring(false);
     } catch (error) {
+
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setTransactionModal({
+        isOpen: true,
+        transactionHash: t('main.notifications.noTransactionHash'),
+        status: TransactionStatus.FAILED,
+        errorMessage: errorMessage
+      });
+      
       toast.error(t('main.notifications.failedToTransfer', { error: error }));
       setIsTransferring(false);
     }
@@ -106,14 +139,12 @@ const MainPage = () => {
       if (isConnected && address) {
         try {
           if (!publicKey) {
-            throw new Error('Public key not available');
+            throw new Error(t('main.notifications.publicKeyNotAvailable'));
           }
           const data = await op20Service.getConectedData(publicKey);
           setConnectedData(data);
-          console.log('Connected data loaded successfully', data);
         } catch (error) {
-          console.error('Error loading connected data:', error);
-          toast.error('Failed to load connected data');
+          toast.error(t('main.notifications.failedToLoadConnectedData', { error: error }));
         }
       } else {
         setConnectedData(null);
@@ -121,7 +152,7 @@ const MainPage = () => {
     };
 
     void loadConnectedData();
-  }, [isConnected, address, publicKey, op20Service]);
+  }, [isConnected, address, publicKey, op20Service, t]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-white">
@@ -157,6 +188,13 @@ const MainPage = () => {
         theme="dark"
         toastClassName="bg-slate-800 border border-slate-600 text-white"
         className={isMobile ? "!top-4 !left-1/2 !transform !-translate-x-1/2 !w-[calc(100%-2rem)] !max-w-sm" : "!bottom-4 !right-1"}
+      />
+      <TransactionModal
+        isOpen={transactionModal.isOpen}
+        onClose={closeTransactionModal}
+        transactionHash={transactionModal.transactionHash}
+        status={transactionModal.status}
+        errorMessage={transactionModal.errorMessage}
       />
     </div>
   );

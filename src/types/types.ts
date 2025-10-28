@@ -6,4 +6,17 @@ export enum ConnectionState {
   CONNECTED = 'connected'
 }
 
+export enum TransactionStatus {
+  PENDING = 'pending',
+  SUCCESS = 'success',
+  FAILED = 'failed'
+}
+
+export interface TransactionModalState {
+  isOpen: boolean;
+  transactionHash: string;
+  status: TransactionStatus;
+  errorMessage?: string;
+}
+
 export type Address = AddressType | null;

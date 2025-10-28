@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 interface CopyButtonProps {
   value: string | number;
@@ -17,7 +18,7 @@ const CopyButton = ({ value }: CopyButtonProps) => {
         setIsCopied(false);
       }, 1000);
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      toast.error(t('main.notifications.failedToCopyToClipboard', { error: error }));
     }
   };
 

@@ -21,7 +21,6 @@
     },
     "wallet": {
       "connect": "Connecter le Portefeuille",
-      "connecting": "Connexion...",
       "connected": "Connecté",
       "disconnect": "Déconnecter",
       "account": "Compte :",
@@ -33,26 +32,30 @@
       "connectingMessage": "Veuillez compléter la connexion dans votre portefeuille",
       "connectTitle": "Connecter Votre Portefeuille",
       "connectMessage": "Connectez-vous à la blockchain OpNet et interagissez avec les tokens OP_20",
-      "networkValue": "OpNet Regtest (ID de Chaîne : 12345)",
       "notConnected": "Non connecté",
       "copyToClipboard": "Copier dans le presse-papiers",
       "copied": "Copié !"
     },
     "transactions": {
-      "title": "Transactions Récentes",
-      "approve": "Approuver les Tokens",
-      "transfer": "Transférer les Tokens",
-      "processing": "Traitement...",
-      "result": "Résultat de la Transaction",
-      "status": "Statut :",
-      "hash": "Hash :",
-      "noTransactions": "Aucune transaction pour le moment"
+      "modal": {
+        "title": "Résultat de la Transaction",
+        "status": {
+          "pending": "EN ATTENTE",
+          "success": "SUCCÈS",
+          "failed": "ÉCHEC"
+        },
+        "transactionHash": "Hash de la Transaction :",
+        "viewOnOpScan": "Voir sur OP_SCAN",
+        "close": "Fermer",
+        "getDetails": "Obtenir les Détails",
+        "getReceipt": "Obtenir le Reçu",
+        "opscanDelayMessage": "Note : L'affichage sur OP_SCAN peut prendre quelques minutes à apparaître"
+      }
     },
     "transfer": {
       "title": "Transférer des Tokens",
       "recipient": "Adresse du Destinataire :",
       "amount": "Montant :",
-      "balance": "Votre Solde :",
       "transfer": "Transférer",
       "send": "Envoyer les Tokens",
       "sending": "Envoi en cours...",
@@ -60,22 +63,20 @@
       "placeholder": {
         "recipient": "Entrez l'adresse du destinataire",
         "amount": "Entrez le montant à transférer"
+      },
+      "validation": {
+        "amountRequired": "Le montant est requis",
+        "amountGreaterThanZero": "Le montant doit être supérieur à 0"
       }
     },
     "notifications": {
-      "walletConnected": "Portefeuille connecté avec succès",
-      "walletDisconnected": "Portefeuille déconnecté avec succès",
-      "tokenMetadataLoaded": "Métadonnées du token chargées avec succès",
-      "tokenBalanceLoaded": "Solde du token chargé avec succès",
-      "tokensApproved": "Tokens approuvés avec succès ! Transaction : {{hash}}...",
       "tokensTransferred": "Tokens transférés avec succès ! Transaction : {{hash}}...",
-      "failedToConnect": "Échec de la connexion du portefeuille. Veuillez réessayer.",
-      "failedToDisconnect": "Échec de la déconnexion du portefeuille",
-      "failedToLoadMetadata": "Échec du chargement des métadonnées du token",
-      "failedToLoadBalance": "Échec du chargement du solde du token",
-      "failedToApprove": "Échec de l'approbation des tokens",
       "failedToTransfer": "Échec du transfert des tokens",
-      "failedToOpenModal": "Échec de l'ouverture de la fenêtre de connexion du portefeuille"
+      "failedToOpenModal": "Échec de l'ouverture de la fenêtre de connexion du portefeuille",
+      "failedToCopyToClipboard": "Échec de la copie dans le presse-papiers",
+      "publicKeyNotAvailable": "Clé publique non disponible",
+      "unknownTransactionHash": "Inconnu",
+      "noTransactionHash": "N/A"
     }
   },
   "features": {
@@ -124,5 +125,23 @@
     "select": "Sélectionner la Langue",
     "english": "English",
     "french": "Français"
+  },
+  "environment": {
+    "configurationError": "Erreur de Configuration",
+    "missingVariables": "Variables d'environnement requises manquantes",
+    "requiredVariables": "L'application nécessite que les variables d'environnement suivantes soient configurées :",
+    "howToFix": "Comment corriger :",
+    "copyEnvExample": "Copiez le fichier env.example vers .env",
+    "fillValues": "Remplissez toutes les valeurs requises dans le fichier .env",
+    "restartServer": "Redémarrez le serveur de développement",
+    "quickSetup": "Configuration Rapide :",
+    "copyExampleFile": "# Copiez le fichier d'exemple",
+    "editWithValues": "# Modifiez avec vos valeurs",
+    "restartServerComment": "# Puis redémarrez le serveur"
+  },
+  "accessibility": {
+    "toggleMobileMenu": "Basculer le menu mobile",
+    "globeIcon": "Globe",
+    "chevronIcon": "Chevron"
   }
 }

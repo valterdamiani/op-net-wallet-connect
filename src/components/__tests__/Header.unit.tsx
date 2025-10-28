@@ -13,6 +13,6 @@ describe('Header', () => {
     
     const navLinks = screen.getAllByRole('link')
     expect(navLinks).toHaveLength(3)
-    expect(screen.getByLabelText('Toggle mobile menu')).toBeInTheDocument()
+    expect(screen.getByTestId('mobile-menu-toggle')).toBeInTheDocument()
   })
 })

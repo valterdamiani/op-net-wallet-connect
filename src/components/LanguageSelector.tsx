@@ -31,13 +31,13 @@ const LanguageSelector = () => {
         <span className="flex items-center gap-1.5">
           <img 
             src={GlobeIcon} 
-            alt="Globe" 
+            alt={t('accessibility.globeIcon')} 
             className="w-4 h-4" 
           />
           {currentLanguage.codeDisplay}
           <img 
             src={ChevronDownIcon} 
-            alt="Chevron" 
+            alt={t('accessibility.chevronIcon')} 
             className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
           />
         </span>
@@ -55,7 +55,7 @@ const LanguageSelector = () => {
             >
               <img 
                 src={GlobeIcon} 
-                alt="Globe" 
+                alt={t('accessibility.globeIcon')} 
                 className="w-4 h-4" 
               />
               {lang.codeDisplay}

@@ -8,7 +8,7 @@ describe('EnvironmentError', () => {
 
   it('renders error message', () => {
     render(<EnvironmentError missingVariables={mockMissingVariables} />)
-    expect(screen.getByText('Configuration Error')).toBeInTheDocument()
+    expect(screen.getByTestId('configuration-error-title')).toBeInTheDocument()
   })
 
   it('shows missing variables', () => {

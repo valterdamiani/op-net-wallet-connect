@@ -21,7 +21,6 @@
     },
     "wallet": {
       "connect": "Connect Wallet",
-      "connecting": "Connecting...",
       "connected": "Connected",
       "disconnect": "Disconnect",
       "account": "Account:",
@@ -33,26 +32,30 @@
       "connectingMessage": "Please complete the connection in your wallet",
       "connectTitle": "Connect Your Wallet",
       "connectMessage": "Connect to OpNet blockchain and interact with OP_20 tokens",
-      "networkValue": "OpNet Regtest (Chain ID: 12345)",
       "notConnected": "Not connected",
       "copyToClipboard": "Copy to clipboard",
       "copied": "Copied!"
     },
     "transactions": {
-      "title": "Recent Transactions",
-      "approve": "Approve Tokens",
-      "transfer": "Transfer Tokens",
-      "processing": "Processing...",
-      "result": "Transaction Result",
-      "status": "Status:",
-      "hash": "Hash:",
-      "noTransactions": "No transactions yet"
+      "modal": {
+        "title": "Transaction Result",
+        "status": {
+          "pending": "PENDING",
+          "success": "SUCCESS",
+          "failed": "FAILED"
+        },
+        "transactionHash": "Transaction Hash:",
+        "viewOnOpScan": "View on OP_SCAN",
+        "close": "Close",
+        "getDetails": "Get Details",
+        "getReceipt": "Get Receipt",
+        "opscanDelayMessage": "Note: Display on OP_SCAN may take a few minutes to appear"
+      }
     },
     "transfer": {
       "title": "Transfer Tokens",
       "recipient": "Recipient Address:",
       "amount": "Amount:",
-      "balance": "Your Balance:",
       "transfer": "Transfer",
       "send": "Send Tokens",
       "sending": "Sending...",
@@ -60,22 +63,20 @@
       "placeholder": {
         "recipient": "Enter recipient address",
         "amount": "Enter amount to transfer"
+      },
+      "validation": {
+        "amountRequired": "Amount is required",
+        "amountGreaterThanZero": "Amount must be greater than 0"
       }
     },
     "notifications": {
-      "walletConnected": "Wallet connected successfully",
-      "walletDisconnected": "Wallet disconnected successfully",
-      "tokenMetadataLoaded": "Token metadata loaded successfully",
-      "tokenBalanceLoaded": "Token balance loaded successfully",
-      "tokensApproved": "Tokens approved successfully! Transaction: {{hash}}...",
       "tokensTransferred": "Tokens transferred successfully! Transaction: {{hash}}...",
-      "failedToConnect": "Failed to connect wallet. Please try again.",
-      "failedToDisconnect": "Failed to disconnect wallet",
-      "failedToLoadMetadata": "Failed to load token metadata",
-      "failedToLoadBalance": "Failed to load token balance",
-      "failedToApprove": "Failed to approve tokens",
       "failedToTransfer": "Failed to transfer tokens",
-      "failedToOpenModal": "Failed to open wallet connection modal"
+      "failedToOpenModal": "Failed to open wallet connection modal",
+      "failedToCopyToClipboard": "Failed to copy to clipboard",
+      "publicKeyNotAvailable": "Public key not available",
+      "unknownTransactionHash": "Unknown",
+      "noTransactionHash": "N/A"
     }
   },
   "features": {
@@ -124,5 +125,23 @@
     "select": "Select Language",
     "english": "English",
     "french": "Français"
+  },
+  "environment": {
+    "configurationError": "Configuration Error",
+    "missingVariables": "Missing required environment variables",
+    "requiredVariables": "The application requires the following environment variables to be configured:",
+    "howToFix": "How to fix:",
+    "copyEnvExample": "Copy the env.example file to .env",
+    "fillValues": "Fill in all the required values in the .env file",
+    "restartServer": "Restart the development server",
+    "quickSetup": "Quick Setup:",
+    "copyExampleFile": "# Copy the example file",
+    "editWithValues": "# Edit with your values",
+    "restartServerComment": "# Then restart the server"
+  },
+  "accessibility": {
+    "toggleMobileMenu": "Toggle mobile menu",
+    "globeIcon": "Globe",
+    "chevronIcon": "Chevron"
   }
 }

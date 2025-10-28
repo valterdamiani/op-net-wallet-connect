@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Address } from '../../types/types';
+import { toast } from 'react-toastify';
 interface TransferSectionProps {
   address: Address;
   isConnected: boolean;
@@ -19,17 +20,53 @@ const TransferSection = ({
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
   const [showTransferForm, setShowTransferForm] = useState(false);
+  const [amountError, setAmountError] = useState('');
+
+  const validateAmount = (value: string): string => {
+    if (!value || value.trim() === '') {
+      return t('main.transfer.validation.amountRequired');
+    }
+    
+    const numValue = parseFloat(value);
+    if (isNaN(numValue) || numValue <= 0) {
+      return t('main.transfer.validation.amountGreaterThanZero');
+    }
+    
+    return '';
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAmount(value);
+    
+    if (amountError) {
+      setAmountError('');
+    }
+  };
+
+  const handleAmountBlur = () => {
+    const error = validateAmount(amount);
+    setAmountError(error);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const amountValidationError = validateAmount(amount);
+    if (amountValidationError) {
+      setAmountError(amountValidationError);
+      return;
+    }
+    
     if (!recipient || !amount || !isConnected) return;
     
     try {
       await onTransfer(recipient, amount, address);
       setRecipient('');
       setAmount('');
+      setAmountError('');
     } catch (error) {
-      console.error('Transfer failed:', error);
+      toast.error(t('main.notifications.failedToTransfer', { error: error }));
     }
   };
 
@@ -81,13 +118,23 @@ const TransferSection = ({
                 id="amount"
                 data-testid="amount-input"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={handleAmountChange}
+                onBlur={handleAmountBlur}
                 placeholder={t('main.transfer.placeholder.amount')}
-                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full px-3 py-2 bg-slate-700/50 border rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent ${
+                  amountError 
+                    ? 'border-red-500 focus:ring-red-500' 
+                    : 'border-slate-600 focus:ring-blue-500'
+                }`}
                 min="0"
                 step="0.000001"
                 required
               />
+              {amountError && (
+                <p className="mt-1 text-sm text-red-400" data-testid="amount-error">
+                  {amountError}
+                </p>
+              )}
             </div>
           </div>
           
@@ -101,8 +148,8 @@ const TransferSection = ({
             </button>
             <button
               type="submit"
-              disabled={!recipient || !amount || isTransferring}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200"
+              disabled={!recipient || !amount || isTransferring || !!amountError}
+              className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600/50 disabled:text-gray-400 disabled:cursor-not-allowed disabled:opacity-50 disabled:border disabled:border-gray-600/30 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200"
             >
               {isTransferring ? (
                 <div className="flex items-center gap-2">
