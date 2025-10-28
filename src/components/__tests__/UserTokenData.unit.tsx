@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '../../test/utils'
+import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import UserTokenData from '../UserTokenData'
 
 vi.mock('../LabelValue', () => ({
@@ -24,8 +25,8 @@ describe('UserTokenData', () => {
       allowance: "500", 
       networkName: "Test Network"
     }
-    render(<UserTokenData isConnected={true} address="0x123" connectedData={mockConnectedData} />)
-    expect(screen.getByText('Your Token Data')).toBeInTheDocument()
+    render(<UserTokenData isConnected={true} address={null} connectedData={mockConnectedData} />)
+    expect(screen.getByTestId('user-token-data')).toBeInTheDocument()
   })
 
   it('renders when disconnected', () => {
@@ -35,6 +36,6 @@ describe('UserTokenData', () => {
       networkName: "Test Network"
     }
     render(<UserTokenData isConnected={false} address={null} connectedData={mockConnectedData} />)
-    expect(screen.getByText('Your Token Data')).toBeInTheDocument()
+    expect(screen.getByTestId('user-token-data')).toBeInTheDocument()
   })
 })

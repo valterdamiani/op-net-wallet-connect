@@ -16,7 +16,7 @@ A React application that connects wallets using @btc-vision/walletconnect and in
 ### Prerequisites
 - **Node.js v18+** (recommended: v18.17.0 or higher)
 - OpNet wallet (https://opnet.org)
-- WalletConnect Project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/)
+- WalletConnect [WalletConnect Cloud](https://cloud.walletconnect.com/)
 
 ### Installation & Setup
 
@@ -61,7 +61,6 @@ npx tsc --noEmit     # Type check without emitting files
 ## 🔧 Environment Variables
 - **Never commit secrets**: The `.env` file is gitignored
 - **Use .env.example**: Template provided for required keys
-- **WalletConnect Project ID**: Get from [WalletConnect Cloud](https://cloud.walletconnect.com/)
 - **Test Network Only**: This app is configured for OpNet testnet
 
 ## 🎯 Features
@@ -75,7 +74,7 @@ npx tsc --noEmit     # Type check without emitting files
 - **Account & Network**: Displays connected wallet address and network information
 - **Token Balance**: Shows user's OP_20 token balance
 - **Allowance**: Displays allowance for configured spender address
-- **Transaction Actions**: Approve and transfer token functionality
+- **Transaction Actions**: Transfer token functionality
 - **Transaction Results**: Shows transaction hash and status
 
 ## 🛠️ Tech Stack
@@ -86,20 +85,6 @@ npx tsc --noEmit     # Type check without emitting files
 - **Tailwind CSS** - Utility-first styling
 - **@btc-vision/walletconnect** - Wallet connection
 - **ESLint** - Code linting
-
-## 📁 Project Structure
-
-```
-src/
-├── components/          # React components
-├── services/           # Business logic
-│   ├── walletService.ts    # WalletConnect integration
-│   └── op20Service.ts      # OP_20 token interactions
-├── assets/             # Static assets
-│   └── op-wallet-icon.svg  # Custom wallet icon
-└── pages/              # Page components
-    └── MainPage.tsx        # Main application page
-```
 
 ## 🔧 Development
 
@@ -140,7 +125,7 @@ npm run build
 1. **View Token Metadata**: Token information is displayed when disconnected
 2. **Connect Wallet**: Click "Connect Wallet" to establish connection
 3. **View Balance**: See your token balance and allowance when connected
-4. **Execute Transactions**: Use "Approve Tokens" or "Transfer Tokens" buttons
+4. **Execute Transactions**: Use "Transfer Tokens" button
 5. **Monitor Results**: View transaction hash and status
 
 ## 📁 Repository Details
@@ -152,7 +137,7 @@ npm run build
 
 ### Network Resources
 
-- **RPC URL**: `regtest.opnet.org`
+- **RPC URL**: `https://regtest.opnet.org`
 - **Faucet**: [https://faucet.opnet.org](https://faucet.opnet.org) - Get test tokens
 - **Block Explorer**: [https://opscan.org](https://opscan.org) - View transactions and blocks
 

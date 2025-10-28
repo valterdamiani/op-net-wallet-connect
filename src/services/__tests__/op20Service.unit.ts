@@ -20,7 +20,7 @@ vi.mock('@btc-vision/transaction', () => ({
 }))
 
 vi.mock('import.meta.env', () => ({
-  VITE_OP20_TOKEN_ADDRESS: '0x123'
+  VITE_MOTO_TOKEN: '0x123'
 }))
 
 import { OP20Service } from '../op20Service'
@@ -36,6 +36,6 @@ describe('OP20Service', () => {
     expect(typeof service.getOp20Contract).toBe('function')
     expect(typeof service.getConectedData).toBe('function')
     expect(typeof service.getTokenMetadata).toBe('function')
-    expect(typeof service.transferTokens).toBe('function')
+    expect(typeof service.safeTransferTokens).toBe('function')
   })
 })

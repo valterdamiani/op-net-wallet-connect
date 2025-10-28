@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '../../../test/utils'
+import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import HeroSection from '../HeroSection'
-import { ConnectionState } from '../../../types/connection'
+import { ConnectionState } from '../../../types/types'
 
 describe('HeroSection', () => {
   const mockProps = {
@@ -17,8 +18,7 @@ describe('HeroSection', () => {
       allowance: '500',
       networkName: 'Test Network'
     },
-    transactions: [],
-    address: '0x123',
+    address: null,
     isConnected: true,
     isTransferring: false,
     connectionState: ConnectionState.CONNECTED,
@@ -30,19 +30,15 @@ describe('HeroSection', () => {
   it('renders hero section with title and subtitle', () => {
     render(<HeroSection {...mockProps} />)
     
-    expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument()
-    
-    const subtitle = screen.getByText((content, element) => {
-      return element?.tagName === 'P' && content.includes('Connect to OpNet blockchain')
-    })
-    expect(subtitle).toBeInTheDocument()
+    expect(screen.getByTestId('hero-title')).toBeInTheDocument()
+    expect(screen.getByTestId('hero-subtitle')).toBeInTheDocument()
   })
 
   it('renders wallet section when connected', () => {
     render(<HeroSection {...mockProps} />)
     
-    expect(screen.getByText('Your Token Data')).toBeInTheDocument()
-    expect(screen.getByText('Transfer Tokens')).toBeInTheDocument()
-    expect(screen.getByText('Token Information')).toBeInTheDocument()
+    expect(screen.getByTestId('user-token-data')).toBeInTheDocument()
+    expect(screen.getByTestId('transfer-section')).toBeInTheDocument()
+    expect(screen.getByTestId('token-info-section')).toBeInTheDocument()
   })
 })

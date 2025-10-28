@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '../../test/utils'
+import { render, screen, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import LoadingButton from '../LoadingButton'
 
 describe('LoadingButton', () => {

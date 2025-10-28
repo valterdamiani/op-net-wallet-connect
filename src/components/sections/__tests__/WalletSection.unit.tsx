@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '../../../test/utils'
+import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import WalletSection from '../WalletSection'
-import { ConnectionState } from '../../../types/connection'
-import { TransactionType, TransactionStatus } from '../../../types/transaction'
+import { ConnectionState } from '../../../types/types'
 
 describe('WalletSection', () => {
   const mockConnectedData = {
@@ -11,23 +11,12 @@ describe('WalletSection', () => {
     networkName: 'Test Network'
   }
 
-  const mockTransactions: Array<{
-    id: string;
-    type: TransactionType;
-    status: TransactionStatus;
-    timestamp: Date;
-    amount?: string;
-    recipient?: string;
-    spender?: string;
-  }> = []
-
   it('renders connecting state', () => {
     render(<WalletSection 
       isConnected={false}
       connectionState={ConnectionState.CONNECTING}
       address={null}
       connectedData={null}
-      transactions={mockTransactions}
       disconnectWallet={vi.fn()}
       handleConnectWallet={vi.fn()}
       onTransfer={vi.fn()}
@@ -42,7 +31,6 @@ describe('WalletSection', () => {
       connectionState={ConnectionState.DISCONNECTED}
       address={null}
       connectedData={null}
-      transactions={mockTransactions}
       disconnectWallet={vi.fn()}
       handleConnectWallet={vi.fn()}
       onTransfer={vi.fn()}
@@ -55,9 +43,8 @@ describe('WalletSection', () => {
     render(<WalletSection 
       isConnected={true}
       connectionState={ConnectionState.CONNECTED}
-      address="0x123"
+      address={null}
       connectedData={mockConnectedData}
-      transactions={mockTransactions}
       disconnectWallet={vi.fn()}
       handleConnectWallet={vi.fn()}
       onTransfer={vi.fn()}

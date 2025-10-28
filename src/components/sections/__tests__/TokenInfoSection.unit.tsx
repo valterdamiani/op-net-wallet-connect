@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '../../../test/utils'
+import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import TokenInfoSection from '../TokenInfoSection'
 
 vi.mock('../../LabelValue', () => ({
@@ -27,12 +28,12 @@ describe('TokenInfoSection', () => {
   }
 
   it('renders token information section', () => {
-    render(<TokenInfoSection tokenMetadata={mockTokenMetadata} address="0x123" isConnected={true} />)
+    render(<TokenInfoSection tokenMetadata={mockTokenMetadata} address={null} isConnected={true} />)
     expect(screen.getByRole('heading')).toBeInTheDocument()
   })
 
   it('renders token metadata', () => {
-    render(<TokenInfoSection tokenMetadata={mockTokenMetadata} address="0x123" isConnected={true} />)
+    render(<TokenInfoSection tokenMetadata={mockTokenMetadata} address={null} isConnected={true} />)
     const labelValues = screen.getAllByTestId('label-value')
     expect(labelValues.length).toBeGreaterThan(0)
   })

@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '../../test/utils'
+import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import EnvironmentError from '../EnvironmentError'
 
 describe('EnvironmentError', () => {
-  const mockMissingVariables = ['VITE_OP20_TOKEN_ADDRESS', 'VITE_WALLET_CONNECT_PROJECT_ID']
+  const mockMissingVariables = ['VITE_MOTO_TOKEN']
 
   it('renders error message', () => {
     render(<EnvironmentError missingVariables={mockMissingVariables} />)
@@ -12,6 +13,6 @@ describe('EnvironmentError', () => {
 
   it('shows missing variables', () => {
     render(<EnvironmentError missingVariables={mockMissingVariables} />)
-    expect(screen.getByText('VITE_OP20_TOKEN_ADDRESS')).toBeInTheDocument()
+    expect(screen.getByText('VITE_MOTO_TOKEN')).toBeInTheDocument()
   })
 })
