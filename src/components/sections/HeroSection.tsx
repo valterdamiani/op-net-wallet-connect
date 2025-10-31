@@ -20,6 +20,8 @@ interface HeroSectionProps {
   disconnectWallet: () => void;
   onTransfer: (recipient: string, amount: string, address: Address) => Promise<void>;
   isTransferring: boolean;
+  useCustomConnectModal: boolean;
+  setUseCustomConnectModal: (value: boolean) => void;
 }
 
 const HeroSection = ({
@@ -32,6 +34,8 @@ const HeroSection = ({
   disconnectWallet,
   onTransfer,
   isTransferring,
+  useCustomConnectModal,
+  setUseCustomConnectModal,
 }: HeroSectionProps) => {
   const { t } = useTranslation();
 
@@ -56,6 +60,8 @@ const HeroSection = ({
             handleConnectWallet={connectWallet}
             onTransfer={onTransfer}
             isTransferring={isTransferring}
+            useCustomConnectModal={useCustomConnectModal}
+            setUseCustomConnectModal={setUseCustomConnectModal}
           />
         </div>
 

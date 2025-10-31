@@ -13,6 +13,8 @@ interface WalletSectionProps {
   handleConnectWallet: () => void;
   onTransfer: (recipient: string, amount: string, address: Address) => Promise<void>;
   isTransferring: boolean;
+  useCustomConnectModal: boolean;
+  setUseCustomConnectModal: (value: boolean) => void;
 }
 
 const WalletSection = ({
@@ -24,11 +26,13 @@ const WalletSection = ({
   disconnectWallet,
   handleConnectWallet,
   onTransfer,
+  useCustomConnectModal,
+  setUseCustomConnectModal,
 }: WalletSectionProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className="mt-8">
+    <div className="mt-8 relative">
       {connectionState === ConnectionState.CONNECTING && (
         <div className="bg-slate-800/95 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-slate-700 mb-8">
           <div className="text-center">
@@ -56,14 +60,14 @@ const WalletSection = ({
             </button>
           </div>
 
-            {connectedData && (
-              <UserTokenData
-                address={address}
-                connectedData={connectedData}
-                isConnected={isConnected}
-              />
-            )}
-          
+          {connectedData && (
+            <UserTokenData
+              address={address}
+              connectedData={connectedData}
+              isConnected={isConnected}
+            />
+          )}
+
           <TransferSection
             address={address}
             isConnected={isConnected}
@@ -74,23 +78,41 @@ const WalletSection = ({
         </div>
       )}
       {connectionState === ConnectionState.DISCONNECTED && (
-        <div className="bg-slate-800/95 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-slate-700 mb-8">
-          <div className="text-center">
-            <h3 className="text-xl sm:text-2xl font-semibold text-white mb-4">{t('main.wallet.connectTitle')}</h3>
-            <p className="text-slate-300 mb-6 text-sm sm:text-base">{t('main.wallet.connectMessage')}</p>
+        <>
+          <div className="bg-slate-800/95 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-slate-700 mb-8">
+            <div className="text-center">
+              <h3 className="text-xl sm:text-2xl font-semibold text-white mb-4">{t('main.wallet.connectTitle')}</h3>
+              <p className="text-slate-300 mb-6 text-sm sm:text-base">{t('main.wallet.connectMessage')}</p>
+              <button
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 w-full sm:w-auto cursor-pointer"
+                onClick={handleConnectWallet}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  {t('main.wallet.connect')}
+                </span>
+              </button>
+            </div>
+          </div>
+          <div className="absolute bottom-0 right-0 flex items-center gap-2 p-4">
+            <span className="text-sm text-slate-300">Use custom connect modal</span>
             <button
-              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 w-full sm:w-auto cursor-pointer"
-              onClick={handleConnectWallet}
+              type="button"
+              role="switch"
+              aria-checked={useCustomConnectModal}
+              onClick={() => setUseCustomConnectModal(!useCustomConnectModal)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-slate-800 ${useCustomConnectModal ? 'bg-cyan-500' : 'bg-slate-600'
+                }`}
             >
-              <span className="flex items-center justify-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                {t('main.wallet.connect')}
-              </span>
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${useCustomConnectModal ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+              />
             </button>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

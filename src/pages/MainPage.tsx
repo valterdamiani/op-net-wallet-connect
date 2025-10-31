@@ -11,10 +11,11 @@ import TransactionModal from '../components/TransactionModal';
 import { OP20Service, ConnectedData } from '../services/op20Service';
 import { useWalletConnect } from '@btc-vision/walletconnect';
 import { ConnectionState, Address, TransactionStatus, TransactionModalState } from '../types/types';
+import WalletsModal from '../components/sections/walletsModal/WalletsModal';
 
 const MainPage = () => {
   const { t } = useTranslation();
-  const { address, walletAddress, openConnectModal, disconnect, publicKey } = useWalletConnect();
+  const { address, walletAddress, disconnect, publicKey, connectToWallet, openConnectModal, allWallets, connecting } = useWalletConnect();
 
   const [tokenMetadata, setTokenMetadata] = useState<{
     name: string;
@@ -32,7 +33,8 @@ const MainPage = () => {
     transactionHash: '',
     status: TransactionStatus.PENDING
   });
-
+  const [showModal, setShowModal] = useState(false);
+  const [useCustomConnectModal, setUseCustomConnectModal] = useState(false);
   const op20Service = useMemo(() => new OP20Service(), []);
 
   const isConnected = !!address;
@@ -46,14 +48,34 @@ const MainPage = () => {
     });
   };
 
-  const handleConnectWallet = async () => {
+  const nativeConnectModal = async () => {
     try {
-      setConnectionState(ConnectionState.CONNECTING);
       await openConnectModal();
     } catch (error) {
-      setConnectionState(ConnectionState.DISCONNECTED);
       toast.error(t('main.notifications.failedToOpenModal', { error: error }));
     }
+  }
+
+  const connectModal = async (wallet: string) => {
+    try {
+      setShowModal(false);
+      await connectToWallet(wallet);
+    } catch (error) {
+      setShowModal(false);
+      toast.error(t('main.notifications.failedToOpenModal', { error: error }));
+    }
+  }
+
+  const handleConnectWallet = async () => {
+    if (useCustomConnectModal) {
+      setShowModal(true);
+
+      return;
+    }
+
+    await nativeConnectModal();
+
+    return;
   };
 
   const handleDisconnectWallet = async () => {
@@ -76,7 +98,6 @@ const MainPage = () => {
 
     try {
       const transaction = await op20Service.safeTransferTokens(walletAddress, inputAddress, amountString, address);
-      
       const transactionHash = transaction?.transactionId || t('main.notifications.unknownTransactionHash');
 
       setTransactionModal({
@@ -96,7 +117,7 @@ const MainPage = () => {
         status: TransactionStatus.FAILED,
         errorMessage: errorMessage
       });
-      
+
       toast.error(t('main.notifications.failedToTransfer', { error: error }));
       setIsTransferring(false);
     }
@@ -112,14 +133,6 @@ const MainPage = () => {
 
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
-
-  useEffect(() => {
-    if (address) {
-      setConnectionState(ConnectionState.CONNECTED);
-    } else {
-      setConnectionState(ConnectionState.DISCONNECTED);
-    }
-  }, [address]);
 
   useEffect(() => {
     const loadTokenMetadata = async () => {
@@ -154,6 +167,16 @@ const MainPage = () => {
     void loadConnectedData();
   }, [isConnected, address, publicKey, op20Service, t]);
 
+  useEffect(() => {
+    if (connecting && !isConnected) {
+      setConnectionState(ConnectionState.CONNECTING);
+    } else if (!connecting && isConnected) {
+      setConnectionState(ConnectionState.CONNECTED);
+    } else {
+      setConnectionState(ConnectionState.DISCONNECTED);
+    }
+  }, [connecting, isConnected])
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-white">
       <Header />
@@ -164,11 +187,13 @@ const MainPage = () => {
           connectedData={connectedData}
           isConnected={isConnected}
           connectionState={connectionState}
-          connectWallet={handleConnectWallet}
+          connectWallet={() => handleConnectWallet()}
           address={address}
           disconnectWallet={handleDisconnectWallet}
           onTransfer={handleTransfer}
           isTransferring={isTransferring}
+          useCustomConnectModal={useCustomConnectModal}
+          setUseCustomConnectModal={setUseCustomConnectModal}
         />
         <FeaturesSection />
         <AboutSection />
@@ -189,6 +214,13 @@ const MainPage = () => {
         toastClassName="bg-slate-800 border border-slate-600 text-white"
         className={isMobile ? "!top-4 !left-1/2 !transform !-translate-x-1/2 !w-[calc(100%-2rem)] !max-w-sm" : "!bottom-4 !right-1"}
       />
+
+      <WalletsModal
+        showModal={showModal}
+        onClose={() => setShowModal(false)}
+        wallets={allWallets}
+        handleSelect={(wallet) => connectModal(wallet)} />
+
       <TransactionModal
         isOpen={transactionModal.isOpen}
         onClose={closeTransactionModal}

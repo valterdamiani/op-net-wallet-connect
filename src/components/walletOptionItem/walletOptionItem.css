@@ -1,0 +1,29 @@
+.wallet-option-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: rgb(29, 41, 61);
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+}
+
+.wallet-option-item:hover {
+    background-color: rgb(37, 51, 73);
+    cursor: pointer;
+}
+
+.wallet-option-item:active {
+    background-color: rgb(29, 41, 61);
+}
+
+.wallet-option-item-icon {
+    height: 40px;
+    margin-right: 10px;
+}
+
+.wallet-option-item-name {
+    font-size: 18px;
+    font-weight: semibold;
+}
