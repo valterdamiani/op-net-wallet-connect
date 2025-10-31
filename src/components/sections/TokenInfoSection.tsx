@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import LabelValue from '../LabelValue';
-import { Address } from '../../types/types';
+import { ConnectedData } from '../../services/op20Service';
 
 interface TokenInfoSectionProps {
   tokenMetadata: {
@@ -10,13 +10,13 @@ interface TokenInfoSectionProps {
     maxSupply: string;
     totalSupply: string;
   };
-  address: Address;
+  connectedData: ConnectedData | null;
   isConnected: boolean;
 }
 
 const TokenInfoSection = ({
   tokenMetadata,
-  address,
+  connectedData,
   isConnected,
 }: TokenInfoSectionProps) => {
   const { t } = useTranslation();
@@ -43,7 +43,7 @@ const TokenInfoSection = ({
         <div className="bg-slate-700/50 p-3 rounded-lg sm:col-span-2 lg:col-span-1">
           <LabelValue
             label={t('main.tokenInfo.address')}
-            value={address ? address.toString() : t('main.wallet.notConnected')}
+            value={connectedData?.tokenAddress ? connectedData?.tokenAddress : t('main.wallet.notConnected')}
             showCopyButton={true}
             centered={!isConnected ? true : false}
             isConnected={isConnected}

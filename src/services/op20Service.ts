@@ -19,6 +19,7 @@ export interface ConnectedData {
     userBalance: string;
     allowance: string;
     networkName: string;
+    tokenAddress: string;
 }
 
 export class OP20Service {
@@ -46,17 +47,19 @@ export class OP20Service {
         const publicKeyInfo = await provider.getPublicKeyInfo(address);
         const chainId = await this.provider.getChainId();
         const network = await this.provider.getNetwork();
-
+        
         const op20Contract = await this.getOp20Contract();
         const userBalance = await op20Contract.balanceOf(publicKeyInfo);
         const allowance = await op20Contract.allowance(address, address);
+        const decimals = await op20Contract.decimals();
 
         const networkName = network.messagePrefix + ' ( Chain ID: ' + chainId.toString() + ')';
 
         return {
-            userBalance: userBalance.properties.balance.toString(),
-            allowance: allowance.properties.remaining.toString(),
+            userBalance: BitcoinUtils.formatUnits(userBalance.properties.balance.toString(), decimals.properties.decimals),
+            allowance: BitcoinUtils.formatUnits(allowance.properties.remaining.toString(), decimals.properties.decimals),
             networkName: networkName,
+            tokenAddress: op20Contract.address.toString()
         };
     }
 
@@ -72,8 +75,8 @@ export class OP20Service {
                 name: name,
                 symbol: symbol,
                 decimals: decimals,
-                totalSupply: totalSupply.toString(),
-                maxSupply: maxSupply.properties.maximumSupply.toString(),
+                totalSupply: BitcoinUtils.formatUnits(totalSupply.toString(), decimals),
+                maxSupply: BitcoinUtils.formatUnits(maxSupply.properties.maximumSupply.toString(), decimals),
             };
         } catch (error) {
             throw new Error(`Failed to fetch token metadata: ${error}`);

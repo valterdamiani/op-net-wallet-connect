@@ -63,7 +63,7 @@ const HeroSection = ({
             <div data-testid="token-info-section">
               <TokenInfoSection
                 tokenMetadata={tokenMetadata}
-                address={address}
+                connectedData={connectedData}
                 isConnected={isConnected}
               />
             </div>
